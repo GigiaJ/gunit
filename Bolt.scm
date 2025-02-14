@@ -90,13 +90,18 @@
   #:use-module (guix build-system go)
   #:use-module (guix build-system pyproject)
   #:use-module (guix build-system python)
-  #:use-module (guix build-system qt))
+  #:use-module (guix build-system qt)
+  #:use-module (guix build utils)
+  #:use-module (guix build gnu-build-system)
+  #:use-module (guix base16)
+)
 
 (define github-source
         (origin
             (method url-fetch)
             (uri (string-append "https://bolt.adamcake.com/" "#tag=" "0.10.0"))
-            (hash "72c8c43dcb61f778a807eb262b2c2ebcb2e1705756de5a9003484af0663aa924")))
+            (sha256
+              (base16-string->bytevector "72c8c43dcb61f778a807eb262b2c2ebcb2e1705756de5a9003484af0663aa924"))))
 
 (define cef-source
     (origin
@@ -125,16 +130,22 @@
                     "BOLT_SKIP_LIBRARIES=1")
             #:phases
             (modify-phases %standard-phases
-                (replace 'unpack
-                    (github-source)
-                    (cef-source)
-                    (system (cmd (string-append "git -C " %source "/Bolt submodule update --init --recursive")))
+                (add-before 'unpack
+                    (format "test")
+                    ;;(github-source)
+                    ;;(cef-source)
+                )
+                (add-after 'unpack 'custom-unpack
+                    (lambda* (#:key source #:allow-other-keys)
+                    (format "test")
+                    ;; (system (cmd (string-append "git -C " %source "/Bolt submodule update --init --recursive")))
                     ;;(system (cmd (string-append "git -C " %source "/Bolt apply " %source "/fmt.patch")))
                     ;;(invoke "patch" "-p1" "-d" (string-append %source "/cef_binary_114.2.11+g87c8807+chromium-114.0.5735.134_linux64_minimal")
                     ;;"-i" (string-append %source "/cef-no-fortify.patch"))
                     ;; Configure is handled by Guile as we have fed the flags needed for it.
                     ;; Build is handled by Guile as the command is simple
-                    ;; Install is handled by Guile as the command is simple    
+                    ;; Install is handled by Guile as the command is simple
+            )
     ))))
     (inputs
         (list "alsa-lib" "at-spi2-core" "cairo" "dbus" "expat" "fmt" "gcc-libs" "gdk-pixbuf2"
@@ -147,3 +158,5 @@
     (home-page "https://bolt.adamcake.com/")
     (description "Free open-source third-party implementation of the Jagex Launcher")
     (license license:agpl3)))
+
+    bolt-launcher
