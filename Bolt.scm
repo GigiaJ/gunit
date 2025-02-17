@@ -135,8 +135,13 @@
                     "-D BOLT_SKIP_LIBRARIES=1")
             #:phases
             #~(modify-phases %standard-phases
-            (replace 'check
-                (lambda _ (display "Do nothing.")    #t))
+            (delete 'check)
+            (add-after 'install 'link-cef
+            (lambda _ 
+            (display (assoc-ref %outputs "out"))
+            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libcef.so"))
+            (display "Do nothing.") #t)
+            )
             )         
                 ))
       
