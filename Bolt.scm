@@ -1,4 +1,4 @@
-(define-module (gnu packages radio)
+(define-module (bolt-launcher)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -14,9 +14,11 @@
   #:use-module (gnu packages avahi)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages backup)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages boost)
   #:use-module (gnu packages check)
+  #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
@@ -52,6 +54,7 @@
   #:use-module (gnu packages multiprecision)
   #:use-module (gnu packages ncurses)
   #:use-module (gnu packages networking)
+  #:use-module (gnu packages nss)
   #:use-module (gnu packages openstack)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
@@ -82,8 +85,10 @@
   #:use-module (gnu packages web)
   #:use-module (gnu packages wxwidgets)
   #:use-module (gnu packages xiph)
+  #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg)
+  #:use-module (gnu packages version-control)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system glib-or-gtk)
   #:use-module (guix build-system gnu)
@@ -94,66 +99,49 @@
   #:use-module (guix build utils)
   #:use-module (guix build gnu-build-system)
   #:use-module (guix base16)
+  #:use-module (nongnu packages chromium)
 )
-
-(define github-source
-        (origin
-            (method url-fetch)
-            (uri (string-append "https://bolt.adamcake.com/" "#tag=" "0.10.0"))
-            (sha256
-              (base16-string->bytevector "72c8c43dcb61f778a807eb262b2c2ebcb2e1705756de5a9003484af0663aa924"))))
-
-(define cef-source
-    (origin
-    (method url-fetch)
-    (uri "https://adamcake.com/cef/cef-114.0.5735.134-linux-x86_64-minimal-ungoogled.tar.gz")
-    (hash "c6618af7c0a787318c655253eced33baed5cc1b1665c938d2d7dc38a8972876f")))
 
 (define-public bolt-launcher
     (package
     (name "bolt-launcher")
     (version "0.10.0")
-    (source github-source)
+    (source (origin
+    (method git-fetch)
+    (uri (git-reference
+    (url "https://github.com/GigiaJ/Bolt")
+  (commit "8c50b9ec555b7033718cacc4e682dadc584a216e")
+  (recursive? #t)))
+  
+        (sha256
+        (base32 "0dshgkzpr5jjgl8qh6idjvc05d1kk1kaiabdq815ngb7yx11wk4n"))))
     (build-system cmake-build-system)
-    (arguments
-        (list
-            #:configure-flags
-                #~(list 
-                    "-S" "Bolt" "-B" "build"
-                    "-G" "Unix Makefiles"
-                    "CMAKE_BUILD_TYPE=Release"
-                    (string-append %source "/CEF_ROOT=cef_binary_114.2.11+g87c8807+chromium-114.0.5735.134_linux64_minimal")
-                    "CMAKE_INSTALL_PREFIX=output"
-                    "BOLT_BINDIR=usr/bin"
-                    "BOLT_LIBDIR=usr/lib"
-                    "BOLT_META_NAME=bolt-launcher"
-                    "BOLT_SKIP_LIBRARIES=1")
-            #:phases
-            (modify-phases %standard-phases
-                (add-before 'unpack
-                    (format "test")
-                    ;;(github-source)
-                    ;;(cef-source)
-                )
-                (add-after 'unpack 'custom-unpack
-                    (lambda* (#:key source #:allow-other-keys)
-                    (format "test")
-                    ;; (system (cmd (string-append "git -C " %source "/Bolt submodule update --init --recursive")))
-                    ;;(system (cmd (string-append "git -C " %source "/Bolt apply " %source "/fmt.patch")))
-                    ;;(invoke "patch" "-p1" "-d" (string-append %source "/cef_binary_114.2.11+g87c8807+chromium-114.0.5735.134_linux64_minimal")
-                    ;;"-i" (string-append %source "/cef-no-fortify.patch"))
-                    ;; Configure is handled by Guile as we have fed the flags needed for it.
-                    ;; Build is handled by Guile as the command is simple
-                    ;; Install is handled by Guile as the command is simple
-            )
-    ))))
+
     (inputs
-        (list "alsa-lib" "at-spi2-core" "cairo" "dbus" "expat" "fmt" "gcc-libs" "gdk-pixbuf2"
-        "glib2" "glibc" "gtk3" "hicolor-icon-theme" "libarchive" "libdrm" "libx11" "libxcb"
-        "libxcomposite" "libxdamage" "libxext" "libxfixes" "libxkbcommon" "libxrandr" "mesa"
-        "nspr" "nss" "pango"))
+        (list 
+        chromium-embedded-framework libarchive glib glibc gtk hicolor-icon-theme fmt spng))
+        (arguments
+        (list
+        #:configure-flags
+                #~(list
+                    (string-append "-D " "CMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out"))
+                    (string-append "-DCEF_DIR=" (assoc-ref %build-inputs "chromium-embedded-framework"))
+                    (string-append "-DCEF_ROOT=" (assoc-ref %build-inputs "chromium-embedded-framework"))
+                    (string-append "-DBOLT_CEF_RESOURCEDIR_OVERRIDE=" (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef")
+                    (string-append "-DBOLT_LIBCEF_DIRECTORY=" (assoc-ref %build-inputs "chromium-embedded-framework") "/lib")
+                    (string-append "-DBOLT_CEF_INCLUDEPATH=" (assoc-ref %build-inputs "chromium-embedded-framework"))
+                    (string-append "-DBOLT_CEF_DLLWRAPPER=" (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef_dll_wrapper.a")
+                    "-D BOLT_META_NAME=bolt-launcher"
+                    "-D BOLT_SKIP_LIBRARIES=1")
+            #:phases
+            #~(modify-phases %standard-phases
+            (replace 'check
+                (lambda _ (display "Do nothing.")    #t))
+            )         
+                ))
+      
     (native-inputs
-        (list "cmake"))
+        (list cmake git))
     (synopsis "Soup")
     (home-page "https://bolt.adamcake.com/")
     (description "Free open-source third-party implementation of the Jagex Launcher")
