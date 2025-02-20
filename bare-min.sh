@@ -1,0 +1,1 @@
+guix shell -C -F -N -D ungoogled-chromium --expose=/etc/machine-id --expose=/dev/dri --expose=/sys/devices --expose=/sys/dev --preserve='^DISPLAY$' --preserve='^XAUTHORITY$' --share=$HOME --share=$XAUTHORITY gcc-toolchain libglvnd sdl2 nss-certs gtk+@2.24.33 openssl@1.1 libsm gdb strace jbr ddd coreutils
