@@ -86,10 +86,10 @@
                         (share (string-append #$output "/share"))
                         (opt "./opt")
                         (usr/share "./usr/share")
-                        (old-exe (string-append "/opt/microsoft/" #$appname "/microsoft-" #$appname))
+                        (old-exe (string-append "/opt/microsoft/msedge/microsoft-" #$appname))
                         (exe (string-append bin "/microsoft-" #$appname)))
                    ;; This allows us to override CHROME_WRAPPER later.
-                   (substitute* (string-append opt "/microsoft/" #$appname "/microsoft-" #$appname)
+                   (substitute* (string-append opt "/microsoft/msedge/microsoft-" #$appname)
                      (("CHROME_WRAPPER") "WRAPPER"))
                    (substitute* (string-append usr/share "/applications/microsoft-" #$appname ".desktop")
                      (("^Exec=.*") (string-append "Exec=" exe "\n")))
@@ -98,15 +98,15 @@
                    (substitute* (string-append usr/share "/menu/microsoft-" #$appname ".menu")
                      (("/opt") share)
                      ((old-exe) exe)))))
-        #!(add-after 'install 'install-icons
+        (add-after 'install 'install-icons
                      (lambda _
                        (define (format-icon-size name)
                          (car
                            (string-split
                             (string-drop-right (string-drop name 13) 4)
                             #\_)))
-                       (let ((icons (string-append #$output "/usr/share/icons/hicolor"))
-                             (share (string-append #$output "/usr/share/microsoft/" #$appname)))
+                       (let ((icons (string-append #$output "/share/icons/hicolor"))
+                             (share (string-append #$output "/share/microsoft/msedge")))
                          (for-each (lambda (icon)
                                      (let* ((icon-name (basename icon))
                                             (icon-size (format-icon-size icon-name))
@@ -116,18 +116,17 @@
                                    (find-files share "product_logo_.*\\.png")))))
                   (add-before 'install-wrapper 'install-exe
                    (lambda _
-                     (let* ((bin (string-append #$output "/usr/bin"))
-                            (exe (string-append bin "/microsoft-" #$appname "-stable"))
-                            (share (string-append #$output "/usr/share"))
-                            (edge-target (string-append share "/microsoft/" #$appname "/microsoft-" #$appname)))
+                     (let* ((bin (string-append #$output "/bin"))
+                            (exe (string-append bin "/microsoft-edge"))
+                            (share (string-append #$output "/share"))
+                            (edge-target (string-append share "/microsoft/msedge/microsoft-edge")))
                        (mkdir-p bin)
-                       (symlink edge-target exe)
+                       (symlink edge-target exe)                  
                        (wrap-program exe
-                         '("CHROME_WRAPPER" = (#$appname))))))
-                         !#
-                (delete 'patch-assets)
-                (delete 'install-wrapper))))
-     (inputs
+                       '("CHROME_WRAPPER" = (#$appname))))))
+                )))
+   
+     (inputs                
       (list bzip2
             curl
             flac
@@ -151,7 +150,7 @@
             wget))
      (synopsis  "Freeware web browser")
      (supported-systems '("x86_64-linux"))
-     (description "Google Chrome is a cross-platform web browser developed by Google.")
+     (description "Microsoft Edge is a cross-platform web browser developed by Microsoft using Chromium.")
      (home-page "https://www.microsoft.com/edge/")
      (license (nonfree "https://www.microsoft.com/intl/en/edge/terms/")))))
 
