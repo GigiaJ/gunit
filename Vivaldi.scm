@@ -29,7 +29,7 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (make-vivaldi repo version hash)
-  (let* ((name (string-append "vivaldi-" repo))
+  (let* ((name (string-append "vivaldi" "-" repo))
          (appname "vivaldi"))
     (package
      (name name)
@@ -45,7 +45,6 @@
      (build-system chromium-binary-build-system)
      (arguments
       (list
-        ;; almost 300MB, faster to download and build from Google servers
         #:substitutable? #f
         #:wrapper-plan
          #~(let ((path (string-append "opt/vivaldi/")))
@@ -82,7 +81,8 @@
                      (("CHROME_WRAPPER") "WRAPPER"))
                    (substitute* (string-append usr/share "/applications/vivaldi-stable.desktop")
                      (("^Exec=.*") (string-append "Exec=" exe "\n")))
-                   ;;(substitute* (string-append usr/share "/gnome-control-center/default-apps/vivaldi-" #$appname ".xml")
+                   (rename-file (string-append usr/share "/applications/vivaldi-stable.desktop") (string-append usr/share "/applications/vivaldi.desktop"))
+                   ;;(substitute* (string-append usr/share "/gnome-control-center/default-apps/vivaldi.xml")
                    ;;  ((old-exe) exe))
                    (substitute* (string-append usr/share "/menu/vivaldi" ".menu")
                      (("/opt") share)
@@ -146,6 +146,6 @@
      (license (nonfree "https://vivaldi.com/privacy/browser/")))))
 
 (define-public vivaldi-stable
-  (make-vivaldi "stable" "7.1.3570.50" "1yh4kg2hrl0rxxli0f22b6vk4br10x74zj5hd8ll334sbzv2633s"))
+  (make-vivaldi "stable" "7.1.3570.54" "1jslsckrv8xwnc4xlrxjiqqpkb74fz51r4yp92p5lr5zj0iayvkh"))
 
 vivaldi-stable
