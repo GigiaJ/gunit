@@ -1,0 +1,81 @@
+
+(source (let ((ffmpeg-origin (package-source ffmpeg)))
+              (origin
+                (inherit ffmpeg-origin)
+                ;; These patches originate come from
+                ;; <https://review.jami.net/plugins/gitiles/jami-daemon/+/refs/heads/master/contrib/src/ffmpeg/>.
+                ;; Make sure to keep them update and/or register any new ones
+                ;; here.
+                (patches
+                 (append
+                  (origin-patches ffmpeg-origin)
+                  (search-patches
+                   "ffmpeg-jami-remove-mjpeg-log.patch"
+                   "ffmpeg-jami-change-RTCP-ratio.patch"
+                   "ffmpeg-jami-rtp_ext_abs_send_time.patch"
+                   "ffmpeg-jami-libopusdec-enable-FEC.patch"
+                   "ffmpeg-jami-libopusenc-reload-packet-loss-at-encode.patch"
+                   "ffmpeg-jami-screen-sharing-x11-fix.patch"
+                   "ffmpeg-jami-pipewiregrab-source-filter.patch"))))))
+
+
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/badlogic/orfondl")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0h1zcxxhvshbc3gkmr33npki6sdjh79haack1cci9k40a0gk144v"))
+              (modules '((guix build utils)))
+              (snippet '(begin
+                          ;; Delete prebuilt binary file.
+                          (delete-file "orfondl")))))
+
+
+GUIX_PROFILE="/home/jaggar/.guix-profile" . "$GUIX_PROFILE/etc/profile"
+
+Need to feed the library path
+LD_LIBRARY_PATH=/gnu/store/hnrl4rvv2v1j2mr1swg1g3qdgwjriifk-ffmpeg-7.0.2/lib:/gnu/store/qgx6b50cak3p7k9m148fy7jnp637nwj2-gcc-14.2.0-lib/lib:/gnu/store/dqryg46gk63hwg29p930dc4yv5ff87dc-libglvnd-1.7.0/lib:/gnu/store/2cxn6fkw8bi2c9wfa5pyxkva9avvzqg6-sdl2-2.30.8/lib:/gnu/store/vi0sgchlqsnvxkklrnfcybc74vy6xv64-gtk+-2.24.33/lib:/gnu/store/2rlxzk2rjdg33li74pyfkq0qnd0xxrsl-libsm-1.2.5/lib:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib:$LD_LIBRARY_PATH
+LD_LIBRARY_PATH=/gnu/store/2rlxzk2rjdg33li74pyfkq0qnd0xxrsl-libsm-1.2.5/lib:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib:/gnu/store/vi0sgchlqsnvxkklrnfcybc74vy6xv64-gtk+-2.24.33/lib:$LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH=/gnu/store/2rlxzk2rjdg33li74pyfkq0qnd0xxrsl-libsm-1.2.5/lib:/gnu/store/vi0sgchlqsnvxkklrnfcybc74vy6xv64-gtk+-2.24.33/lib:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib:$LD_LIBRARY_PATH
+export LD_PRELOAD=/gnu/store/2cxn6fkw8bi2c9wfa5pyxkva9avvzqg6-sdl2-2.30.8/lib/libSDL2-2.0.so.0:/gnu/store/dqryg46gk63hwg29p930dc4yv5ff87dc-libglvnd-1.7.0/lib/libOpenGL.so.0
+/gnu/store/jmq0rxxlby679bd0vlws6zv2ppjnwgcy-runescape-launcher-2.2.11/usr/bin/runescape-launcher
+
+
+
+export LD_LIBRARY_PATH=/gnu/store/2rlxzk2rjdg33li74pyfkq0qnd0xxrsl-libsm-1.2.5/lib:/gnu/store/vi0sgchlqsnvxkklrnfcybc74vy6xv64-gtk+-2.24.33/lib:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib:$LD_LIBRARY_PATH
+export LD_PRELOAD=/gnu/store/2cxn6fkw8bi2c9wfa5pyxkva9avvzqg6-sdl2-2.30.8/lib/libSDL2-2.0.so.0:/gnu/store/dqryg46gk63hwg29p930dc4yv5ff87dc-libglvnd-1.7.0/lib/libOpenGL.so.0:/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/libpthread.so.0:/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/libc.so.6:/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/libdl.so.2:/gnu/store/dqryg46gk63hwg29p930dc4yv5ff87dc-libglvnd-1.7.0/lib/libEGL.so.1:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib/libcrypto.so.1.1:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib/libssl.so.1.1:/gnu/store/caqpshl5nhcnsa8fnm4mz6bsa9y8fi2v-zlib-1.3/lib/libz.so.1:/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/libm.so.6:/gnu/store/q3jhlvrdn8fp6fpl4nbzpkya3jmph0n2-pulseaudio-16.1/lib/libpulse.so.0
+/gnu/store/jmq0rxxlby679bd0vlws6zv2ppjnwgcy-runescape-launcher-2.2.11/usr/bin/runescape-launcher
+
+
+Need to patch the interpreter
+patchelf --set-interpreter /gnu/store/0vhynz1afwvpmdqs3gxg7rj8dwbiill8-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Documents/rs3
+
+patchelf --set-interpreter /gnu/store/0vhynz1afwvpmdqs3gxg7rj8dwbiill8-glibc-2.39/lib/ld-linux-x86-64.so.2 /gnu/store/357cgvwl4ilzr23dx9zxpx4mif0nxfvy-runescape-launcher-2.2.11/usr/share/games/runescape-launcher/runescape
+
+/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39
+
+patchelf --set-interpreter /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Jagex/launcher/rs2client --set-rpath /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib
+
+strings ./rs2client | grep GLIBC
+
+Needed to run RS3
+gnome-themes-extra
+
+patchelf --set-interpreter /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Jagex/launcher/rs2client --set-rpath /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib:/gnu/store/mrhmgl5pzw5lvls6p7ylal6pp2yladc1-sdl2-2.0.14/lib
+
+
+readelf -d /home/jaggar/Jagex/launcher/rs2client
+readelf -a /home/jaggar/Jagex/launcher/rs2client | grep interpreter
+patchelf --set-interpreter /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Jagex/launcher/rs2client
+
+
+df45a4e9-13c8-4fe4-b879-b9ed056a3634
+
+debugging
+
+gdb
+valgrind
