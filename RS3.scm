@@ -1,25 +1,56 @@
 (define-module (runescape-launcher)
 #:use-module ((guix licenses) #:prefix license:)
-#:use-module (guix gexp)
+#:use-module ((nonguix licenses) #:prefix license:)
+#:use-module (guix git-download)
 #:use-module (guix packages)
 #:use-module (guix download)
+#:use-module (guix gexp)
+#:use-module (guix build-system gnu)
+#:use-module (guix build-system python)
 #:use-module (guix build-system copy)
-#:use-module (gnu packages gtk)
-#:use-module (gnu packages gcc)
-#:use-module (guix build-system glib-or-gtk)
-#:use-module (gnu packages glib)
-#:use-module (gnu packages debian)
-#:use-module (gnu packages tls)
+#:use-module (gnu packages audio)
 #:use-module (gnu packages base)
-#:use-module (gnu packages linux)
-#:use-module (gnu packages gl)
-#:use-module (gnu packages xorg)
-#:use-module (gnu packages sdl)
+#:use-module (gnu packages bash)
+#:use-module (gnu packages certs)
 #:use-module (gnu packages compression)
+#:use-module (gnu packages curl)
+#:use-module (gnu packages debian)
 #:use-module (gnu packages elf)
+#:use-module (gnu packages file)
+#:use-module (gnu packages fonts)
+#:use-module (gnu packages fontutils)
+#:use-module (gnu packages freedesktop)
+#:use-module (gnu packages gawk)
+#:use-module (gnu packages gcc)
+#:use-module (gnu packages gl)
+#:use-module (gnu packages glib)
+#:use-module (gnu packages gnome)
+#:use-module (gnu packages graphics)
+#:use-module (gnu packages gtk)
+#:use-module (gnu packages libbsd)
+#:use-module (gnu packages libusb)
+#:use-module (gnu packages linux)
+#:use-module (gnu packages llvm)
+#:use-module (gnu packages logging)
+#:use-module (gnu packages lsof)
 #:use-module (gnu packages networking)
-)
-(define-public runescape-launcher
+#:use-module (nongnu packages nvidia)
+#:use-module (gnu packages pciutils)
+#:use-module (gnu packages pulseaudio)
+#:use-module (gnu packages python)
+#:use-module (gnu packages python-web)
+#:use-module (gnu packages python-xyz)
+#:use-module (gnu packages toolkits)
+#:use-module (gnu packages tls)
+#:use-module (gnu packages sdl)
+#:use-module (gnu packages video)
+#:use-module (gnu packages xorg)
+#:use-module (nonguix build-system chromium-binary)
+#:use-module (nonguix multiarch-container)
+#:use-module (nonguix utils))
+
+
+(define runescape-launcher
     (package
     (name "runescape-launcher")
     (version "2.2.11")
@@ -49,10 +80,16 @@
         (add-before 'install 'patch-elf-interpreter
            (lambda _
              (display (invoke "ls" "-a" "./usr/share/games/runescape-launcher"))
-             (invoke "setcap" "cap_net_raw+ep" "./usr/share/games/runescape-launcher/runescape")
-             ;;(let ((glibc (assoc-ref %build-inputs "glibc"))
-               ;;    (elf-file "./usr/share/games/runescape-launcher/runescape"))
-               ;;(invoke "patchelf" "--set-interpreter" (string-append glibc "/lib/ld-linux-x86-64.so.2") elf-file))
+             ;;(invoke "setcap" "cap_net_raw+ep" "./usr/share/games/runescape-launcher/runescape")
+             (substitute* "./usr/bin/runescape-launcher"
+             (("unset XMODIFIERS") (string-append "$envVarsWithXmodifiers"))
+             (("/usr/share/games/runescape-launcher/runescape")
+              (string-append (assoc-ref %outputs "out") "/usr/share/games/runescape-launcher/runescape")))
+              (display "catssss")
+            
+              (let ((glibc (assoc-ref %build-inputs "glibc"))
+                   (elf-file "./usr/share/games/runescape-launcher/runescape"))
+              (invoke "patchelf" "--set-interpreter" (string-append glibc "/lib/ld-linux-x86-64.so.2") elf-file))
                #t))
         ;; (delete 'install)
         )
@@ -66,4 +103,128 @@
     (description "RuneScape Game Client (NXT)")
     (license license:agpl3))) ;; Update license as this is a placeholder
 
-runescape-launcher
+
+    (define steam-client-libs
+    `(("at-spi2-core" ,at-spi2-core)      ; Required (often) for SteamVR interface.
+      ("bash" ,bash)                      ; Required for steam startup.
+      ("cairo", cairo)
+      ("coreutils" ,coreutils)
+      ("diffutils" ,diffutils)
+      ("dbus-glib" ,dbus-glib)            ; Required for steam browser.
+      ("elfutils" ,elfutils)              ; Required for capturing library dependencies in pv.
+      ("eudev" ,eudev)                    ; Required for steamwebhelper/heavy runtime.
+      ("fontconfig" ,fontconfig)          ; Required for steam client.
+      ("file" ,file)                      ; Used for steam installation.
+      ("find" ,findutils)                 ; Required at least for some logging.
+      ("font-google-noto" ,font-google-noto) ; Not required but to match following fonts.
+      ;; These next three fonts are to cover emoji and Chinese/Japanese/Korean
+      ;; and related scripts.
+      ("font-google-noto-emoji" ,font-google-noto-emoji)
+      ("font-google-noto-sans-cjk" ,font-google-noto-sans-cjk)
+      ("font-google-noto-serif-cjk" ,font-google-noto-serif-cjk)
+      ("freetype" ,freetype)              ; Required for steam login.
+      ("gawk" ,gawk)
+      ("gdk-pixbuf" ,gdk-pixbuf)          ; Required for steam tray icon.
+      ;; Required for steam startup; use newer version for better compatibility
+      ;; with some games like Dwarf Fortress.
+      ("gcc:lib" ,gcc-14 "lib")
+      ("glib" ,glib)
+      ("grep" ,grep)
+      ("gtk+" ,gtk+)
+      ("gtk" ,gtk+-2)
+      ("libbsd" ,libbsd)
+      ("libcap" ,libcap)                  ; Required for SteamVR, but needs pkexec too.
+      ("libglvnd" ,libglvnd)
+      ("libusb" ,libusb)                  ; Required for SteamVR.
+      ("libsm" ,libsm)
+      ("libva" ,libva)                    ; Required for hardware video encoding/decoding.
+      ("libvdpau" ,libvdpau)              ; Required for hardware video encoding/decoding.
+      ("libvdpau-va-gl" ,libvdpau-va-gl)  ; Additional VDPAU support.
+      ("libx11" ,libx11)
+      ("libxxf86vm" ,libxxf86vm)
+      ("llvm" ,llvm-for-mesa)             ; Required for mesa.
+      ("lsof" ,lsof)                      ; Required for some friend's list actions.
+      ("mesa" ,mesa)                      ; Required for steam startup.
+      ("nss-certs" ,nss-certs)            ; Required for steam login.
+      ("pango" ,pango)
+      ("pciutils" ,pciutils)              ; Tries to run lspci at steam startup.
+      ("procps" ,procps)
+      ("openssl" ,openssl-1.1)
+      ("sed" ,sed)
+      ("sdl2" ,sdl2)
+      ("tar" ,tar)
+      ("usbutils" ,usbutils)              ; Required for SteamVR.
+      ("util-linux" ,util-linux)          ; Required for steam login.
+      ("wayland" ,wayland)                ; Required for mesa vulkan (e.g. libvulkan_radeon).
+      ("xdg-user-dirs" ,xdg-user-dirs)    ; Suppress warning of missing xdg-user-dir.
+      ("flatpak-xdg-utils" ,flatpak-xdg-utils)
+      ("xz" ,xz)
+      ("zenity" ,zenity)
+      ("zlib" ,zlib)
+    ))                ; Required for progress dialogs.
+  
+  (define steam-gameruntime-libs
+    `(("alsa-lib" ,alsa-lib)              ; Required for audio in most games.
+      ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio") ; Required for audio in most games.
+      ("font-dejavu" ,font-dejavu)
+      ("font-liberation" ,font-liberation)
+      ("imgui" ,imgui-1.86)               ; Required for MangoHud.
+      ("mangohud" ,mangohud)
+      ("openal" ,openal)                  ; Prevents corrupt audio in Crypt of the Necrodancer.
+      ("pulseaudio" ,pulseaudio)          ; Prevents corrupt audio in Sven Coop.
+      ("python" ,python)                  ; Required for KillingFloor2 and Wreckfest.
+      ("spdlog" ,spdlog)))                ; Required for MangoHud.
+  
+  (define steam-container-libs
+    (append steam-client-libs
+            steam-gameruntime-libs
+            fhs-min-libs))
+  
+  (define steam-nvidia-container-libs
+    (modify-inputs steam-container-libs
+      (replace "mesa" nvda)))
+
+(define steam-ld.so.conf
+(packages->ld.so.conf
+ (list (fhs-union steam-container-libs
+                  #:name "fhs-union-64")
+       (fhs-union steam-container-libs
+                  #:name "fhs-union-32"
+                  #:system "i686-linux"))))
+
+(define steam-ld.so.cache
+(ld.so.conf->ld.so.cache steam-ld.so.conf))
+
+(define steam-nvidia-ld.so.conf
+(packages->ld.so.conf
+ (list (fhs-union steam-nvidia-container-libs
+                  #:name "fhs-union-64")
+       (fhs-union steam-nvidia-container-libs
+                  #:name "fhs-union-32"
+                  #:system "i686-linux"))))
+
+(define steam-nvidia-ld.so.cache
+(ld.so.conf->ld.so.cache steam-nvidia-ld.so.conf))
+
+
+    
+(define-public runescape-container
+    (nonguix-container
+    (name "runescape")
+    (wrap-package runescape-launcher)
+    (run "/usr/bin/runescape-launcher")
+    (ld.so.conf steam-ld.so.conf)
+    (ld.so.cache steam-ld.so.cache)
+    (union64
+    (fhs-union steam-container-libs
+                #:name "fhs-union-64"))
+    (union32
+    (fhs-union steam-container-libs
+                #:name "fhs-union-32"
+                #:system "i686-linux"))
+    (link-files '("usr"))
+    (description "Runescape.")))
+    
+(define-public runescape (nonguix-container->package runescape-container))
+
+runescape
