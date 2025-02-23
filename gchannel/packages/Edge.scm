@@ -3,7 +3,7 @@
 ;;; Copyright © 2022 Mathieu Othacehe <m.othacehe@gmail.com>
 ;;; Copyright © 2022 Jonathan Brielmaier <jonathan.brielmaier@web.de>
 
-(define-module (nongnu packages edge)
+(define-module (gchannel packages edge)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages curl)

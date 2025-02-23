@@ -1,4 +1,4 @@
-(define-module (bolt-launcher)
+(define-module (gchannel packages bolt-launcher)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
