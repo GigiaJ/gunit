@@ -21,3 +21,8 @@ https://peter.sh/experiments/chromium-command-line-switches/
 Probably unstable and we should address it
 
 https://guix.gnu.org/manual/en/html_node/package-Reference.html#package-Reference
+
+
+
+
+Update licenses for packages
