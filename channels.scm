@@ -2,6 +2,6 @@
 (use-modules (guix git))
 
 (channel
-  (name 'g-packages)
+  (name 'gchannel)
   (url "https://github.com/GigiaJ/Guix-Personal-Packages.git")
   (branch "main"))
