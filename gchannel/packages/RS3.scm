@@ -1,4 +1,4 @@
-(define-module (runescape-launcher)
+(define-module (gchannel packages runescape-launcher)
 #:use-module ((guix licenses) #:prefix license:)
 #:use-module ((nonguix licenses) #:prefix license:)
 #:use-module (guix git-download)
