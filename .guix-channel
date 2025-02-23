@@ -3,7 +3,7 @@
   (url "https://github.com/GigiaJ/Guix-Personal-Packages.git")
   (dependencies
     (channel
-    (name 'nonguix)
+    (name nonguix)
     (url "https://gitlab.com/nonguix/nonguix")
     (introduction
       (channel-introduction
