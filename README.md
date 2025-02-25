@@ -31,3 +31,6 @@ Update licenses for packages
 
 Bolt needs to be wrapped so it has access to LD_LIBRARY_PATH
 (wrap-program)
+
+
+Add OS keyring so we can keep persistence 
