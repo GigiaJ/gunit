@@ -1,4 +1,4 @@
-(define-module (gchannel packages droidcam-obs-plugin)
+(define-module (gchannel packages obs-droidcam)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -14,9 +14,9 @@
   #:use-module (guix build-system gnu)
 )
 
-(define-public droidcam-obs-plugin
+(define-public obs-droidcam
     (package
-    (name "droidcam-obs-plugin")
+    (name "obs-droidcam")
     (version "2.3.4")
     (source (origin
     (method git-fetch)
@@ -69,4 +69,4 @@
     (description "plugin for droidcam obs")
     (license license:agpl3)))
 
-    droidcam-obs-plugin
+obs-droidcam
