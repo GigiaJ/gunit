@@ -123,14 +123,18 @@
 
     (inputs
         (list 
-        chromium-embedded-framework libarchive glib glibc gtk hicolor-icon-theme fmt spng mesa vulkan-loader vscodium ungoogled-chromium wayland))
+        chromium-embedded-framework libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium ungoogled-chromium wayland))
         (arguments
         (list
         #:tests? #f             ; no check target
         #:configure-flags
                 #~(list
+                    ;; Can probably clean this up
                     (string-append "-D " "CMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out"))
                     ;;(string-append "-D " "BOLT_DEV_SHOW_DEVTOOLS=" "1")
+                    (string-append "-DBOLT_BINDIR=" "./bin")
+                    (string-append "-DBOLT_SHAREDIR=" "./share")
+                    (string-append "-DBOLT_LIBDIR=" "./lib")
                     (string-append "-DCEF_DIR=" (assoc-ref %build-inputs "chromium-embedded-framework"))
                     (string-append "-DCEF_ROOT=" (assoc-ref %build-inputs "chromium-embedded-framework"))
                     (string-append "-DBOLT_CEF_RESOURCEDIR_OVERRIDE=" (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef")
@@ -143,21 +147,34 @@
             #:phases
             #~(modify-phases %standard-phases
             (add-after 'install 'link-cef
-            (lambda _ 
-            (display (assoc-ref %outputs "out"))
-            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libcef.so"))
-            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef/icudtl.dat") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/icudtl.dat"))
-            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef/v8_context_snapshot.bin") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/v8_context_snapshot.bin"))
-            (symlink (string-append (assoc-ref %build-inputs "vscodium") "/opt/vscodium/libGLESv2.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libGLESv2.so"))
-            (symlink (string-append (assoc-ref %build-inputs "vscodium") "/opt/vscodium/libEGL.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libEGL.so"))
-            (symlink (string-append (assoc-ref %build-inputs "vscodium") "/opt/vscodium/libvulkan.so.1") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libvulkan.so.1"))
-            (symlink (string-append (assoc-ref %build-inputs "vscodium") "/opt/vscodium/libvk_swiftshader.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libvk_swiftshader.so"))
-            
-            (display "Do nothing.") #t)
-            )
-            )         
+            (lambda _
+                (map (lambda (entry)
+                    (let* ((source (car entry)) (file (cdr entry)))
+                    (symlink (string-append (assoc-ref %build-inputs source) file)
+                            (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/" (basename file)))))
+                    (append
+                    (map (lambda (file) (cons "chromium-embedded-framework" file))
+                        '("/lib/libcef.so" "/share/cef/icudtl.dat" "/share/cef/v8_context_snapshot.bin"))
+                    (map (lambda (file) (cons "vscodium" file))
+                        '("/opt/vscodium/libGLESv2.so" "/opt/vscodium/libEGL.so"
+                        "/opt/vscodium/libvulkan.so.1" "/opt/vscodium/libvk_swiftshader.so"))))
+
+                (wrap-program (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt")
+                `("LD_LIBRARY_PATH" ":" prefix (
+                    ,(string-append #$(this-package-input "mesa") "/lib")
+                    ,(string-append #$(this-package-input "vulkan-loader") "/lib")
+                    ,(string-append #$(this-package-input "nss") "/lib/nss")
                 ))
-      
+                `("XDG_DATA_DIRS" ":" prefix (
+                    ,(string-append #$(this-package-input "gtk") "/share")
+                ))
+                `("PATH" ":" prefix (
+                    ,(string-append #$(this-package-input "xdg-utils") "/bin")
+                )))
+
+                (invoke "mv" (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt") (string-append (assoc-ref %outputs "out") "/bin/bolt"))
+             #t))
+            )))
     (native-inputs
         (list cmake git wayland))
     (synopsis "Soup")
