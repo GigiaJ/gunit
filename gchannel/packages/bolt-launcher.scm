@@ -109,7 +109,7 @@
 (define-public bolt-launcher
     (package
     (name "bolt-launcher")
-    (version "0.10.0")
+    (version "0.11.0")
     (source (origin
     (method git-fetch)
     (uri (git-reference
