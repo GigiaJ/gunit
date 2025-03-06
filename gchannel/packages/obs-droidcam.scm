@@ -46,18 +46,15 @@
             #:phases
             #~(modify-phases %standard-phases
             (delete 'configure)
-            (add-before 'build 'cats
+            (add-before 'build 'configure-directory
             (lambda _
             (mkdir-p "build")))
             (replace 'install
             (lambda _ 
-            (display (assoc-ref %outputs "out"))
-            (invoke "ls" "-a" "./build")
             (mkdir-p (string-append (assoc-ref %outputs "out")  "/lib/obs-plugins"))
             (mkdir-p (string-append (assoc-ref %outputs "out")  "/share/obs/obs-plugins"))
             (invoke "cp" "./build/droidcam-obs.so" (string-append (assoc-ref %outputs "out") "/lib/obs-plugins/droidcam-obs.so"))
-            (invoke "cp" "-r" "./data/locale" (string-append (assoc-ref %outputs "out") "/share/obs/obs-plugins/droidcam-obs"))
-            (display "Do nothing.") #t)
+            (invoke "cp" "-r" "./data/locale" (string-append (assoc-ref %outputs "out") "/share/obs/obs-plugins/droidcam-obs")) #t)
             )
             )         
                 ))
