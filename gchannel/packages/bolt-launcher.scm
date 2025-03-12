@@ -123,7 +123,7 @@
 
     (inputs
         (list 
-        chromium-embedded-framework libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium ungoogled-chromium wayland))
+        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium ungoogled-chromium wayland))
         (arguments
         (list
         #:tests? #f             ; no check target
@@ -162,7 +162,7 @@
                 (wrap-program (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt")
                 `("LD_LIBRARY_PATH" ":" prefix (
                     ,(string-append #$(this-package-input "mesa") "/lib")
-                    ,(string-append #$(this-package-input "vulkan-loader") "/lib")
+                    ,(string-append #$(this-package-input "eudev") "/lib")
                     ,(string-append #$(this-package-input "nss") "/lib/nss")
                 ))
                 `("XDG_DATA_DIRS" ":" prefix (
