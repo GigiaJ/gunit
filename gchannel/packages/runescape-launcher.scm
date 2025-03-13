@@ -34,9 +34,11 @@
 #:use-module (gnu packages logging)
 #:use-module (gnu packages lsof)
 #:use-module (gnu packages networking)
+#:use-module (gnu packages nss)
 #:use-module (nongnu packages nvidia)
 #:use-module (gnu packages pciutils)
 #:use-module (gnu packages pulseaudio)
+#:use-module (gnu packages pretty-print)
 #:use-module (gnu packages python)
 #:use-module (gnu packages python-web)
 #:use-module (gnu packages python-xyz)
@@ -44,7 +46,9 @@
 #:use-module (gnu packages tls)
 #:use-module (gnu packages sdl)
 #:use-module (gnu packages video)
+#:use-module (gnu packages xdisorg)
 #:use-module (gnu packages xorg)
+#:use-module (gnu packages xml)
 #:use-module (nonguix build-system chromium-binary)
 #:use-module (nonguix multiarch-container)
 #:use-module (nonguix utils))
@@ -113,9 +117,11 @@
       ("dbus-glib" ,dbus-glib)            ; Required for steam browser.
       ("elfutils" ,elfutils)              ; Required for capturing library dependencies in pv.
       ("eudev" ,eudev)                    ; Required for steamwebhelper/heavy runtime.
+      ("expat" ,expat)                    ; Needed for RS3
       ("fontconfig" ,fontconfig)          ; Required for steam client.
       ("file" ,file)                      ; Used for steam installation.
       ("find" ,findutils)                 ; Required at least for some logging.
+      ("fmt" ,fmt)                 ; Needed for RS3
       ("font-google-noto" ,font-google-noto) ; Not required but to match following fonts.
       ;; These next three fonts are to cover emoji and Chinese/Japanese/Korean
       ;; and related scripts.
@@ -129,23 +135,33 @@
       ;; with some games like Dwarf Fortress.
       ("gcc:lib" ,gcc-14 "lib")
       ("glib" ,glib)
+      ("glibc" ,glibc)
       ("grep" ,grep)
       ("gtk+" ,gtk+)
       ("gtk" ,gtk+-2)
       ("libbsd" ,libbsd)
       ("libcap" ,libcap)                  ; Required for SteamVR, but needs pkexec too.
+      ("libdrm" ,libdrm)                  ; Needed for RS3
       ("libglvnd" ,libglvnd)
       ("libusb" ,libusb)                  ; Required for SteamVR.
       ("libsm" ,libsm)
+      ("libxcb" ,libxcb)                  ; Needed for RS3
+      ("libxcomposite" ,libxcomposite)    ; Needed for RS3
+      ("libxext" ,libxext)    ; Needed for RS3
+      ("libxkbcommon" ,libxkbcommon)    ; Needed for RS3
       ("libva" ,libva)                    ; Required for hardware video encoding/decoding.
       ("libvdpau" ,libvdpau)              ; Required for hardware video encoding/decoding.
       ("libvdpau-va-gl" ,libvdpau-va-gl)  ; Additional VDPAU support.
       ("libx11" ,libx11)
+      ("libxdamage" ,libxdamage)          ; Needed for RS3
+      ("libxfixes" ,libxfixes)            ; Needed for RS3
       ("libxxf86vm" ,libxxf86vm)
       ("llvm" ,llvm-for-mesa)             ; Required for mesa.
       ("lsof" ,lsof)                      ; Required for some friend's list actions.
       ("mesa" ,mesa)                      ; Required for steam startup.
+      ("nspr" ,nspr)                      ; Required for RS3
       ("nss-certs" ,nss-certs)            ; Required for steam login.
+      ("nss" ,nss)                        ; Needed for RS3
       ("pango" ,pango)
       ("pciutils" ,pciutils)              ; Tries to run lspci at steam startup.
       ("procps" ,procps)
