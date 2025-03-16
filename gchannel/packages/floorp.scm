@@ -64,12 +64,12 @@
                        (Comment . "Your web, the way you like it")
                        (Exec . ,exec-path) ;; Precomputed value
                        (Icon . ,icon-path) ;; Precomputed value
-                       (Terminal . #f)
+                       (Terminal . false)
                        (Type . "Application")
                        (StartupWMClass . "Floorp")
                        (MimeType . "text/html;text/xml;application/xhtml+xml;text/mml;x-scheme-handler/http;x-scheme-handler/https;")
-                       (Startup-Notify . #t)
-                       (X-MultipleArgs . #f)
+                       (Startup-Notify . true)
+                       (X-MultipleArgs . false)
                        (X-Desktop-File-Install-Version . "0.16")
                        (Categories . "Network;WebBrowser;")
                        (Encoding . "UTF-8")))
