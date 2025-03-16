@@ -20,6 +20,7 @@
   #:use-module (gnu packages check)
   #:use-module (gnu packages chromium)
   #:use-module (gnu packages cmake)
+  #:use-module (gnu packages commencement)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
@@ -27,7 +28,6 @@
   #:use-module (gnu packages engineering)
   #:use-module (gnu packages fltk)
   #:use-module (gnu packages freedesktop)
-  #:use-module (gnu packages gcc)
   #:use-module (gnu packages gd)
   #:use-module (gnu packages geo)
   #:use-module (gnu packages gettext)
@@ -121,13 +121,19 @@
 
     (inputs
         (list 
-        libglvnd mesa libx11 gtk sdl2 gcc glib libxkbcommon libnl libnsl iptables coreutils))
+        libglvnd mesa libx11 gtk sdl2 gcc-toolchain glib libxkbcommon libnl libnsl iptables coreutils))
         (arguments
         (list
         #:tests? #f             ; no check target
             #:phases
             #~(modify-phases %standard-phases
-             (delete 'validate-runpath)
+                (add-after 'install 'wrap
+                (lambda _ 
+                (wrap-program (string-append (assoc-ref %outputs "out") "/lib/node")
+                `("LD_LIBRARY_PATH" ":" prefix (
+                    ,(string-append #$(this-package-input "gcc-toolchain") "/lib")
+                )))))
+                (delete 'validate-runpath)
             )))
     (native-inputs
         (list cmake git wayland))
