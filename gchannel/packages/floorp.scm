@@ -1,4 +1,4 @@
-(define-module (gchannel packages code-server)
+(define-module (gchannel packages floorp)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -85,12 +85,6 @@
 
                         (mkdir-p (string-append #$output "/share/applications"))
                         (write-desktop-entry (string-append #$output "/share/applications/" "floorp.desktop") desktop-entry))
-                 
-                 
-
-                        ;; A function to write the desktop entry to a file
-                        
-
                     )
                 )
                 (add-after 'create 'wrap
