@@ -55,6 +55,42 @@
                 (add-after 'install-icons 'install-share
                     (lambda _
                         (display "cat")
+                        (let* ((exec-path (string-append #$output "/bin/floorp %u"))
+                        (icon-path (string-append #$output "/share/icons/hicolor/128x128/apps/floorp.png")))
+                   (define desktop-entry
+                     `((Version . "1.0")
+                       (Name . "Floorp")
+                       (GenericName . "Web Browser")
+                       (Comment . "Your web, the way you like it")
+                       (Exec . ,exec-path) ;; Precomputed value
+                       (Icon . ,icon-path) ;; Precomputed value
+                       (Terminal . #f)
+                       (Type . "Application")
+                       (StartupWMClass . "Floorp")
+                       (MimeType . "text/html;text/xml;application/xhtml+xml;text/mml;x-scheme-handler/http;x-scheme-handler/https;")
+                       (Startup-Notify . #t)
+                       (X-MultipleArgs . #f)
+                       (X-Desktop-File-Install-Version . "0.16")
+                       (Categories . "Network;WebBrowser;")
+                       (Encoding . "UTF-8")))
+                 
+                   (define (write-desktop-entry file-name entry)
+                        (call-with-output-file file-name
+                            (lambda (port)
+                            (format port "[Desktop Entry]~%")
+                            (for-each
+                            (lambda (field)
+                                (format port "~a=~a~%" (car field) (cdr field)))
+                            entry))))
+
+                        (mkdir-p (string-append #$output "/share/applications"))
+                        (write-desktop-entry (string-append #$output "/share/applications/" "floorp.desktop") desktop-entry))
+                 
+                 
+
+                        ;; A function to write the desktop entry to a file
+                        
+
                     )
                 )
                 (add-after 'create 'wrap
