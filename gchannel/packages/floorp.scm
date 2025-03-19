@@ -75,6 +75,8 @@
 
     (inputs
         (list 
+        alsa-lib
+        gcc-toolchain
         bash-minimal
         eudev
         libnotify
@@ -131,7 +133,7 @@
         bzip2
         libbluray
         gnutls
-        
+        pciutils 
     ))
         (arguments
         (list
@@ -202,6 +204,7 @@
                                                           lib-name)
                                                "/lib"))
                               '(
+                                "alsa-lib"
                                 "libpng-apng"
                                 "libva"
                                 "mesa"
@@ -254,11 +257,8 @@
                                 "bzip2"
                                 "libbluray"
                                 "gnutls"
-                              
-
-                                
-                                
-                            
+                                "gtk+"
+                                "pciutils"
                             )))
                               (gtk-share (string-append (assoc-ref inputs
                               "gtk+")
