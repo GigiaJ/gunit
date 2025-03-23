@@ -40,6 +40,7 @@
   #:use-module (gnu packages cyrus-sasl)
   #:use-module (gnu packages popt)
   #:use-module (gnu packages readline)
+  #:use-module (gnu packages rsync)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages tls)
   #:use-module (gnu packages tex)
@@ -72,27 +73,27 @@
     (arguments
     (list #:phases
           #~(modify-phases %standard-phases
-              ;;(delete 'configure)
+(add-after 'install 'move
+        (lambda _
+      (invoke "rsync" "-a" (string-append #$output #$output "/") (string-append #$output))
+      (invoke "rm" "-rf" (string-append #$output "/gnu"))
+)
+)       
             )
           #:tests? #f ; there are no tests for the runtime library
           #:make-flags
           #~(list
-                 (string-append "DESTDIR=" #$output)
+         (string-append "DESTDIR=" #$output)
+          (string-append "PREFIX=")
                 )))
     (inputs
      (list openssl-1.1))
     (native-inputs
-     (list libxslt docbook-xsl pkg-config))
+     (list libxslt rsync pkg-config))
     (home-page "https://github.com/OpenSC/libp11/wiki")
     (synopsis "Tools and libraries related to smart cards")
     (description
-     "The PKCS#11 API is an abstract API to perform operations on cryptographic
-objects such as private keys, without requiring access to the objects themselves.
-That is, it provides a logical separation of the keys from the operations.
-The PKCS #11 API is mainly used to access objects in smart cards and Hardware
-or Software Security Modules (HSMs). That is because in these modules the
-cryptographic keys are isolated in hardware or software and are not made
-available to the applications using them.")
+     "something")
     (license license:lgpl2.1+)))
 
 libp11
