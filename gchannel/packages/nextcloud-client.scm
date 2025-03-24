@@ -1,4 +1,4 @@
-(define-module (ghcannel packages nextcloud-client)
+(define-module (gchannel packages nextcloud-client)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system copy)
