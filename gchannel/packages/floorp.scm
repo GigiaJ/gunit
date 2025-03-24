@@ -65,10 +65,10 @@
 (define-public floorp
     (package
     (name "floorp")
-    (version "11.24.0")
+    (version "11.24.1")
     (source (origin
     (method url-fetch)
-    (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-" version ".linux-x86_64.tar.bz2"))
+    (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" "11.24.0" "/floorp-" "11.24.0" ".linux-x86_64.tar.bz2"))
         (sha256
         (base32 "1abmanvim06nc3dhiwi9j63714dyfqqwlnj3984ld21ydz9kaffv"))))
     (build-system copy-build-system)
@@ -86,7 +86,6 @@
         pipewire
         pulseaudio
         glibc
-        gcc
         gtk+
         libdrm
         llvm-for-mesa
@@ -133,7 +132,7 @@
         bzip2
         libbluray
         gnutls
-        pciutils 
+        pciutils
     ))
         (arguments
         (list
@@ -211,7 +210,7 @@
                                 "pipewire"
                                 "pulseaudio"
                                 "glibc"
-                                "gcc"
+                                "gcc-toolchain"
                                 "libdrm"
                                 "llvm-for-mesa"
                                 "expat"
