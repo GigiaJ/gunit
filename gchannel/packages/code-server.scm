@@ -16,13 +16,13 @@
 (define-public code-server
     (package
     (name "code-server")
-    (version "4.98.0")
+    (version "4.98.2")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/coder/code-server/releases/download/v" version "/code-server-" version "-linux-amd64.tar.gz"))
   
         (sha256
-        (base32 "0ajiy9aav1w7pf7bdvyqbd54v9kfl9qbc1446p7i9nhv5wd1h7p1"))))
+        (base32 "1zvr89yyhk51fbg9g3q62dq2nf9s5q5kkl32xi50y88n5yzwlajr"))))
     (build-system copy-build-system)
 
     (inputs
