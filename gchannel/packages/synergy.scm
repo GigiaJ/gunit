@@ -1,4 +1,4 @@
-(define-module (gnu packages synergy)
+(define-module (gchannel packages synergy)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix build utils) ; Added: Provides substitute* used in phases
