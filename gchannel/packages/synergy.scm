@@ -55,6 +55,12 @@
        (lambda* (#:key #:allow-other-keys)
        (system* "sed" "-i" "s|set(CMAKE_INSTALL_PREFIX /usr)| |g" "cmake/Packaging.cmake")
          #t)) ;
+         (add-after 'install 'patch-desktop
+         (lambda* (#:key outputs #:allow-other-keys)
+           (let ((out (assoc-ref outputs "out")))
+             (substitute* (string-append out "/share/applications/synergy.desktop")
+               (("/usr") out))
+             #t)))
 )))
     (native-inputs
      (list qttools pkg-config))           ; for Qt5LinguistTools
