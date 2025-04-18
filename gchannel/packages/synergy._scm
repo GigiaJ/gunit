@@ -8,10 +8,11 @@
   #:use-module (guix build-system meson)
   #:use-module (gnu packages)
   #:use-module (gnu packages avahi)
+  #:use-module (gchannel packages libportal)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages cpp)
   #:use-module (gnu packages compression)
-  #:use-module (gnu packages freedesktop)
+  #:use-module ((gnu packages freedesktop) #:select (libei))
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages linux)
@@ -55,12 +56,34 @@
        (lambda* (#:key #:allow-other-keys)
        (system* "sed" "-i" "s|set(CMAKE_INSTALL_PREFIX /usr)| |g" "cmake/Packaging.cmake")
          #t)) ;
-         (add-after 'install 'patch-desktop
+         (add-after 'install 'wrap-synergy-executable
+         (lambda* (#:key inputs outputs #:allow-other-keys)
+         (let ((out (assoc-ref outputs "out"))
+         (openssl (assoc-ref inputs "openssl"))
+         (xkeyboard-config (assoc-ref inputs "xkeyboard-config")))
+         (wrap-program (string-append out "/bin/deskflow")
+         `("PATH" ":" prefix (,(string-append openssl "/bin"))))
+          (wrap-program (string-append out "/bin/deskflow-client")
+          `("PATH" ":" prefix (,(string-append openssl "/bin"))))
+           (wrap-program (string-append out "/bin/deskflow-server")
+           `("PATH" ":" prefix (,(string-append openssl "/bin"))))
+            (wrap-program (string-append out "/bin/deskflow-legacy")
+            `("PATH" ":" prefix (,(string-append openssl "/bin")))   
+        )
+   
+   
+   
+   
+    )
+           #t))
+         (add-after 'wrap-synergy-executable 'patch-desktop
          (lambda* (#:key outputs #:allow-other-keys)
            (let ((out (assoc-ref outputs "out")))
-             (substitute* (string-append out "/share/applications/synergy.desktop")
-               (("/usr") out))
-             #t)))
+           (substitute* (string-append out "/share/applications/deskflow.desktop")
+           (("/usr") out))
+           (system* "mv" (string-append out "/share/applications/deskflow.desktop") (string-append out "/share/applications/synergy.desktop"))
+         #t)))
+         
 )))
     (native-inputs
      (list qttools pkg-config))           ; for Qt5LinguistTools
@@ -83,6 +106,7 @@
        ("pugixml"   ,pugixml)
        ("tomlplusplus"    ,tomlplusplus)
        ("qtbase"    ,qtbase)
+       ("xkeyboard-config" ,xkeyboard-config)
     ))
     (home-page "https://symless.com/synergy")
     (synopsis "Mouse and keyboard sharing utility")
