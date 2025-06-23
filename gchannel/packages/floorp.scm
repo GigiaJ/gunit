@@ -70,7 +70,7 @@
     (method url-fetch)
     (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-" version ".linux-x86_64.tar.bz2"))
         (sha256
-        (base32 "14ahhhk5qjwcqqgmbi01w7k56alqjsm8n8axk3yr1naw59k1yd24"))))
+        (base32 "1pk9jdap7y9jp8hxdi9zz2k27z4nfbzncm8glsgy7gbnpw8szkkv"))))
     (build-system copy-build-system)
 
     (inputs
