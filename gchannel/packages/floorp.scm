@@ -65,7 +65,7 @@
 (define-public floorp
     (package
     (name "floorp")
-    (version "11.25.0")
+    (version "11.27.0")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-" version ".linux-x86_64.tar.bz2"))
