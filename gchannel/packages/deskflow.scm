@@ -1,4 +1,4 @@
-(define-module (gchannel packages synergy)
+(define-module (gchannel packages deskflow)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix build utils)
