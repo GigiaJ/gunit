@@ -38,7 +38,7 @@
       (file-name (git-file-name name version))
       (sha256
        (base32
-        "1d3v2zp3vf2wb5ddxagl8s554h7rpgjwnwjkc0lpx0rp6g6hm3z9"))))
+        "1vavii28wkm5j18fg2gdrzpwv1m8q3lwvi6mghcajwv134f155yd"))))
     (build-system cmake-build-system)
     (arguments
     (list
