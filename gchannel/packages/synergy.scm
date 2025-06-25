@@ -28,7 +28,7 @@
 (define-public synergy
   (package
     (name "synergy")
-    (version "1.17.1")
+    (version "1.18.0")
     (source
      (origin
       (method git-fetch)
