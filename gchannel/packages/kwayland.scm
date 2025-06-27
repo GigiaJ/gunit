@@ -1,4 +1,4 @@
-(define-module (gchannel packages xdg-desktop-portal-kde)
+(define-module (gchannel packages kwayland)
 
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system python)
