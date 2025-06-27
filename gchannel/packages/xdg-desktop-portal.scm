@@ -99,7 +99,7 @@
 (define-public xdg-desktop-portal
   (package
     (name "xdg-desktop-portal")
-    (version "1.20.0")
+    (version "1.20.1")
     (source
      (origin
        (method url-fetch)
@@ -108,7 +108,7 @@
              version "/xdg-desktop-portal-" version ".tar.xz"))
        (sha256
         (base32
-         "0fjjaymvpvsjcz7scv5g3i3qzp1f4yyvscfmxlxkzpzgd7qndmik"))
+         "1pn0q7nn9xzd2wva9zpxn1dd2kqxwjm2a68yv9gaaa4alh9cvkb6"))
        ))
     (build-system meson-build-system)
     (arguments
