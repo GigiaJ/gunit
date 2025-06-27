@@ -97,14 +97,14 @@
   #:use-module (gnu packages xorg)
   #:use-module (srfi srfi-1))
 
-(define-public xdg-desktop-portal-kde
+(define-public xdg-desktop-portal-kde-alt
   (package
     (name "xdg-desktop-portal-kde")
-    (version "6.1.5")
+    (version "6.1.6")
     (source (origin
               (method url-fetch)
-              (uri (string-append "mirror://kde/stable/plasma/" version "/"
-                                  name "-" version ".tar.xz"))
+              (uri (string-append "mirror://kde/stable/plasma/" "6.1.5" "/"
+                                  name "-" "6.1.5" ".tar.xz"))
               (sha256
                (base32
                 "0y39bbgh2fvl4ryx6xzm06gs67i7gs8bxxfi94r0ip7x0q63rl89"))))
@@ -147,4 +147,4 @@ for xdg-desktop-portal that is using Qt/KF5.")
     (license license:lgpl2.0+)))
 
 
-xdg-desktop-portal-kde
+xdg-desktop-portal-kde-alt
