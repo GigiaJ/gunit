@@ -1,5 +1,5 @@
 
-(define-module (gchannel packages hyprland)
+(define-module (gchannel packages hyprland-input-capture)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -95,7 +95,7 @@
   #:use-module (gnu packages xml)
   #:use-module (gnu packages xorg))
 
-(define-public hyprland
+(define-public hyprland-input-capture
   (package
     (name "hyprland")
     (version "0.49.1")
@@ -178,4 +178,4 @@
 its looks.")
     (license license:bsd-3)))
 
-hyprland
+hyprland-input-capture
