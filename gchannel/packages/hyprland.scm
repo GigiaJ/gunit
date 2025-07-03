@@ -1,5 +1,5 @@
 
-(define-module (gchannel packages hyprland-protocols)
+(define-module (gchannel packages hyprland)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -98,16 +98,14 @@
   (package
     (name "hyprland")
     (version "0.49.1")
-
-(source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/3l0w/Hyprland.git")
-                    (commit "821497bc2379b8bef091c455bbfbfeec19f5ae4b)
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0njqyl6vsqlb8dv4wdn5h34dk67yqzc99gvwa13j252cv3n0bpya"))))))
+        (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/3l0w/Hyprland.git")
+             (commit "821497bc2379b8bef091c455bbfbfeec19f5ae4b")))
+       (sha256
+        (base32 "0njqyl6vsqlb8dv4wdn5h34dk67yqzc99gvwa13j252cv3n0bpya"))))
     ;; The project's native build system is Meson.
     (build-system meson-build-system)
 
