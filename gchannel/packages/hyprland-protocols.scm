@@ -1,4 +1,4 @@
-(define-module (gchannel packages hyprland-protocols)
+(define-module (gchannel packages hyprland-protocols-input-capture)
   #:use-module (guix bzr-download)
   #:use-module (guix download)
   #:use-module (guix gexp)
@@ -94,16 +94,16 @@
   #:use-module (gnu packages xorg)
   #:use-module (srfi srfi-1))
 
-(define-public hyprland-protocols
+(define-public hyprland-protocols-input-capture
   (package
     (name "hyprland-protocols")
-    (version "0.6.6")
+    (version "0.6.4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
                     (url "https://github.com/3l0w/hyprland-protocols.git")
                     (commit "5433c38e9755e83905376ed0faf5c624869e24b9")))
-              (file-name (git-file-name name "0.6.6"))
+              (file-name (git-file-name name "0.6.4"))
               (sha256
                (base32
                 "0ybs6nkihk19cxbqccfkj23m884x78l54nx5wpbf0nr3s34s6xws"))))
@@ -114,4 +114,4 @@
      "This package provides Wayland protocol extensions for Hyprland.")
     (license license:bsd-3)))
 
-    hyprland-protocols
+    hyprland-protocols-input-capture
