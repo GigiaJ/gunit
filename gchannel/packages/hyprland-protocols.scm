@@ -97,7 +97,7 @@
 (define-public hyprland-protocols-input-capture
   (package
     (name "hyprland-protocols-input-capture")
-    (version "0.6.4")
+    (version "0.6.7")
     (source (origin
               (method git-fetch)
               (uri (git-reference
