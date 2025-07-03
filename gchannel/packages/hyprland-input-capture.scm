@@ -97,7 +97,7 @@
 
 (define-public hyprland-input-capture
   (package
-    (name "hyprland")
+    (name "hyprland-input-capture")
     (version "0.49.1")
         (source
      (origin
