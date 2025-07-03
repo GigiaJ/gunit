@@ -1,4 +1,4 @@
-(define-module (gchannel packages xdg-desktop-portal-hyprland)
+(define-module (gchannel packages xdg-desktop-portal-hyprland-input-capture)
   #:use-module (guix bzr-download)
   #:use-module (guix download)
   #:use-module (guix gexp)
@@ -95,7 +95,7 @@
   #:use-module (gnu packages xorg)
   #:use-module (srfi srfi-1))
 
-(define-public xdg-desktop-portal-hyprland
+(define-public xdg-desktop-portal-hyprland-input-capture
   (package
     (name "xdg-desktop-portal-hyprland")
     (version "1.3.11")
@@ -140,4 +140,4 @@
      "This package provides an @code{xdg-desktop-portal} backend for Hyprland.")
     (license license:bsd-3)))
 
-xdg-desktop-portal-hyprland
+xdg-desktop-portal-hyprland-input-capture
