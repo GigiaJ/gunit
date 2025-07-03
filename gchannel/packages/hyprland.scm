@@ -151,7 +151,7 @@
            cairo
            hyprcursor
            hyprgraphics
-           hyprland-protocols
+           hyprland-protocols-input-capture
            hyprland-qtutils
            hyprlang
            hyprutils
