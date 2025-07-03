@@ -103,7 +103,7 @@
               (uri (git-reference
                     (url "https://github.com/3l0w/hyprland-protocols.git")
                     (commit "5433c38e9755e83905376ed0faf5c624869e24b9")))
-              (file-name (git-file-name hyprland-protocols "0.6.4"))
+              (file-name (git-file-name "hyprland-protocols" "0.6.4"))
               (sha256
                (base32
                 "0ybs6nkihk19cxbqccfkj23m884x78l54nx5wpbf0nr3s34s6xws"))))
