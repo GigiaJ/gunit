@@ -2,6 +2,7 @@
 (define-module (gchannel packages hyprland-input-capture)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
+  #:use-module (gchannel packages libinput-input-capture)
   #:use-module (guix download)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
@@ -103,17 +104,16 @@
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/3l0w/Hyprland.git")
+             (url "https://github.com/3l0w/Hyprland")
              (commit "821497bc2379b8bef091c455bbfbfeec19f5ae4b")))
        (sha256
-        (base32 "0njqyl6vsqlb8dv4wdn5h34dk67yqzc99gvwa13j252cv3n0bpya"))))
+        (base32 "03qayx0xwcrcb0haxvlq8pasnlfvqc1xzhnlmjbizg70dda9iyxp"))))
     ;; The project's native build system is Meson.
     (build-system meson-build-system)
 
     (arguments
      (list
       #:tests? #f
-      ;; Use Meson's build-in options to configure the project.
       #:configure-flags
       #~'("-Dhyprpm=disabled")
       #:phases
@@ -140,7 +140,7 @@
                       (search-input-file inputs (in-vicinity "bin" cmd)))))))))
 
     (native-inputs
-     (list gcc-14
+     (list gcc-15
            hyprwayland-scanner
            (module-ref (resolve-interface
                   '(gnu packages commencement))
@@ -156,7 +156,6 @@
            hyprland-qtutils
            hyprlang
            hyprutils
-           libinput-minimal
            libxcursor
            libxkbcommon
            mesa
@@ -165,6 +164,7 @@
            re2-next
            udis86
            wayland
+           libinput-input-capture
            wayland-protocols
            linux-libre-headers-6.14
            xcb-util-errors
