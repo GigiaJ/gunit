@@ -97,7 +97,7 @@
 
 (define-public xdg-desktop-portal-hyprland-input-capture
   (package
-    (name "xdg-desktop-portal-hyprland")
+    (name "xdg-desktop-portal-hyprland-input-capture")
     (version "1.3.11")
     (source
      (origin
@@ -105,7 +105,7 @@
        (uri (git-reference
              (url "https://github.com/3l0w/xdg-desktop-portal-hyprland")
              (commit "55afeb19c5833f9805fd383bd3525e2d8547e883")))
-       (file-name (git-file-name name version))
+       (file-name (git-file-name "xdg-desktop-portal-hyprland" version))
        (sha256
         (base32 "1bkyhz6nslksj6hbd9i3fgkvkcfga4n4nnm4dhk612cnma6b58pj"))))
     (build-system qt-build-system)
