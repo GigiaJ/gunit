@@ -134,7 +134,7 @@
 (define-public jupyter
   (package
     (name "jupyter")
-    (version "1.0.0")
+    (version "1.0.1")
     (source
      (origin
        (method url-fetch)
