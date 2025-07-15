@@ -38,5 +38,6 @@ Add OS keyring so we can keep persistence
 
 
 Set up as:
+git remote set-url --add --push origin https://gitea.something.something/jaggar/Guix-Personal-Packages.git
 git remote set-url --add --push origin https://codeberg.org/Gigia/Guix-Personal-Packages.git
 git remote set-url --add --push origin https://github.com/GigiaJ/Guix-Personal-Packages.git
