@@ -1,6 +1,4 @@
-;;; Filename: mbp-kernel.scm
-
-(define-module (mbp-kernel)
+(define-module (gchannel packages mbp-kernel)
   #:use-module (guix packages)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
