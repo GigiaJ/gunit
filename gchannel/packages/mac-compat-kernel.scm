@@ -1,4 +1,4 @@
-(define-module (gchannel packages mbp-kernel)
+(define-module (gchannel packages mac-compat-kernel)
   #:use-module (guix packages)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
