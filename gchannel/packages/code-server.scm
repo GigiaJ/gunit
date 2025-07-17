@@ -39,7 +39,14 @@
         #:tests? #f             ; no check target
             #:phases
             #~(modify-phases %standard-phases
-                (add-after 'install 'wrap 
+                            (add-after 'install 'patch-interpreter
+                  (lambda* (#:key native-inputs inputs outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (interpreter (string-append (assoc-ref inputs "glibc")
+                                                       "/lib/ld-linux-x86-64.so.2"))
+                           (binary (string-append out "/lib/node")))
+                      (invoke "patchelf" "--set-interpreter" interpreter binary))))
+                (add-after 'patch-interpreter 'wrap 
                 (lambda _
                 (wrap-program (string-append (assoc-ref %outputs "out") "/lib/node")
                 `("LD_LIBRARY_PATH" ":" prefix (
