@@ -234,7 +234,6 @@
             
             (invoke "mv" (string-append #$output "/lib/floorp/floorp") (string-append #$output "/bin/floorp"))
             ))
-                (delete 'validate-runpath)
             )))
     (native-inputs
         (list git patchelf))
