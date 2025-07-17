@@ -32,6 +32,7 @@
         gcc-toolchain
         woff-tools
         font-nerd-fonts-jetbrains-mono
+        glibc
         ))
         (arguments
         (list
