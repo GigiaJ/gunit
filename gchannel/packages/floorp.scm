@@ -139,7 +139,15 @@
             #:install-plan #~'(("." "lib/floorp"))
             #:phases
             #~(modify-phases %standard-phases
-                (add-after 'install 'create
+                (delete 'validate-runpath) ;; Technically we could patch the shared libs, but it isn't needed.
+                (add-after 'install 'patch-interpreter
+                  (lambda* (#:key native-inputs inputs outputs #:allow-other-keys)
+                    (let* ((out (assoc-ref outputs "out"))
+                           (interpreter (string-append (assoc-ref inputs "glibc")
+                                                       "/lib/ld-linux-x86-64.so.2"))
+                           (binary (string-append out "/lib/floorp/floorp")))
+                      (invoke "patchelf" "--set-interpreter" interpreter binary))))
+                (add-after 'patch-interpreter 'create
                     (lambda _
                         (mkdir-p (string-append  #$output "/bin"))
                         ;;(mkdir-p (string-append  #$output "/share/icons/hicolor"))
