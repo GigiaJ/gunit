@@ -220,21 +220,15 @@
                                 "libcdio" "libcaca" "libass" "vidstab" "fontconfig-minimal" "freetype"
                                 "bzip2" "libbluray" "gnutls" "gtk+" "pciutils"
                             )))
-                              (gtk-share (string-append (assoc-ref inputs
-                              "gtk+")
-                   "/share")))
+                              (gtk-share (string-append (assoc-ref inputs "gtk+") "/share")))
                    (display libs)
                   (wrap-program (car (find-files lib "^glxtest$"))
                     `("LD_LIBRARY_PATH" prefix ,libs))
                 (wrap-program (car (find-files lib "^floorp$"))
-                    `("LD_LIBRARY_PATH" prefix
-                      (,@libs))
-                    `("XDG_DATA_DIRS" prefix
-                    (,gtk-share))
-                    `("MOZ_LEGACY_PROFILES" =
-                      ("1"))
-                    `("MOZ_ALLOW_DOWNGRADE" =
-                      ("1")))
+                    `("LD_LIBRARY_PATH" prefix (,@libs))
+                    `("XDG_DATA_DIRS" prefix (,gtk-share))
+                    `("MOZ_LEGACY_PROFILES" = ("1"))
+                    `("MOZ_ALLOW_DOWNGRADE" = ("1")))
                 )
                     
             
