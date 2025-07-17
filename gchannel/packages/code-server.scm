@@ -18,7 +18,7 @@
 (define-public code-server
     (package
     (name "code-server")
-    (version "4.101.1")
+    (version "4.102.0")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/coder/code-server/releases/download/v" version "/code-server-" version "-linux-amd64.tar.gz"))
