@@ -237,7 +237,7 @@
                 (delete 'validate-runpath)
             )))
     (native-inputs
-        (list git))
+        (list git patchelf))
     (synopsis "Soup")
     (home-page "https://coder.com/")
     (description "Free open source code server")
