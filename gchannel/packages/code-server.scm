@@ -86,7 +86,7 @@
                 (delete 'validate-runpath)
             )))
     (native-inputs
-        (list git curl))
+        (list git curl patchelf))
     (synopsis "Soup")
     (home-page "https://coder.com/")
     (description "Free open source code server")
