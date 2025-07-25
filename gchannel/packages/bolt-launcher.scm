@@ -123,7 +123,7 @@
 
     (inputs
         (list 
-        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium ungoogled-chromium wayland))
+        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium wayland))
         (arguments
         (list
         #:tests? #f             ; no check target
