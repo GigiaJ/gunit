@@ -159,15 +159,13 @@
            (assoc-ref glib-or-gtk:%standard-phases 'glib-or-gtk-compile-schemas))
          (add-after 'glib-or-gtk-compile-schemas 'glib-or-gtk-wrap
            (assoc-ref glib-or-gtk:%standard-phases 'glib-or-gtk-wrap))
-         (add-after 'qt-wrap 'qpa-platform
-         (lambda _
-           ;; Use sed to insert the QT_QPA_PLATFORM environment variable in our wrap-program
-           ;;(system* "ls" "-a")
-           ;;sed command is valid, but the path for output is not right now
-           ;;I believe it must be bound at some point like through the ingestion of this command in the lambda statement
-           (system* "sed" "-i" "/^export XDG_DATA_DIRS=/i export QT_QPA_PLATFORM=xcb" (string-append #$output "/bin/nextcloud"))
-          #t
-          ))
+        (add-after 'qt-wrap 'qpa-platform
+          (lambda* (#:key outputs #:allow-other-keys)
+            (let ((out (assoc-ref outputs "out")))
+              (system* "sed" "-i"
+                      "/^export XDG_DATA_DIRS=/i export QT_QPA_PLATFORM=xcb"
+                      (string-append out "/bin/nextcloud"))
+              #t)))
         )))
     (native-inputs
      `(("cmocka" ,cmocka)
