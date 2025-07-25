@@ -24,7 +24,7 @@
     (uri (string-append "https://github.com/coder/code-server/releases/download/v" version "/code-server-" version "-linux-amd64.tar.gz"))
   
         (sha256
-        (base32 "1km3ygz4fblnk5g05s0wrp3rwlpn3yik0kz0w9wwcfh9ana9ilgl"))))
+        (base32 "1s33d8821hcpkv10643dc58m177nrsy4238fyx2qbkh3smx98p25"))))
     (build-system copy-build-system)
 
     (inputs
