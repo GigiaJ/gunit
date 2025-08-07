@@ -137,7 +137,7 @@
             util-linux
             xdg-utils
             wget))
-     (synopsis  "Freeware web browser")
+     (synopsis  "Customizable chromium browser")
      (supported-systems '("x86_64-linux"))
      (description "Vivaldi is a highly customizable browser developed by Vivaldi.")
      (home-page "https://vivaldi.com/")
@@ -145,5 +145,3 @@
 
 (define-public vivaldi-stable
   (make-vivaldi "stable" "7.1.3570.54" "1jslsckrv8xwnc4xlrxjiqqpkb74fz51r4yp92p5lr5zj0iayvkh"))
-
-vivaldi-stable
