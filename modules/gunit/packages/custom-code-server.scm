@@ -1,12 +1,15 @@
 (define-module (gunit packages custom-code-server)
   #:use-module (guix gexp)
   #:use-module (guix packages)
+  #:use-module (guix build utils)
+  #:use-module (guix utils)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages)
-  #:use-module (guix build-system gnu) ; For modify-phases
-  #:use-module (ice-9 ftw)             ; For scandir
-  #:use-module (srfi srfi-1)           ; For list processing
-  
-  #:use-module (gunit packages code-server)
+  #:use-module (guix build-system copy)
+  #:use-module (guix build copy-build-system)
+  #:use-module (ice-9 ftw)
+  #:use-module (srfi srfi-1)
+  #:use-module (gchannel packages code-server)
   #:use-module (selected-guix-works packages fonts)
   #:use-module (gnu packages fontutils))
 
@@ -14,56 +17,49 @@
   (package/inherit code-server
     (name "code-server-with-fonts")
     
-    ;; Add the font package to the regular inputs
-    (inputs (append (package-inputs code-server)
-                    (list font-nerd-fonts-jetbrains-mono)))
+    (inputs
+(append (package-inputs code-server)
+            ;; (list font-nerd-fonts-jetbrains-mono)
+            ))
     
-    ;; Add the woff tools to the native inputs (for building)
-    (native-inputs (append (package-native-inputs code-server)
-                           (list woff-tools)))
+    (native-inputs
+     (append (package-native-inputs code-server)
+            ;; (list woff-tools)
+            ))
     
     (arguments
-      #~(modify-phases #$@(package-arguments code-server)
-          (add-after 'wrap 'enable-font-magic
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (let* ((font-pkg-name "font-nerd-fonts-jetbrains-mono")
-                     (font-package (assoc-ref inputs font-pkg-name))
-                     (font-path (string-append font-package "/share/fonts/truetype/"))
-                     (font-prefix "JetBrainsMonoNerdFontMono-")
-                     (out (assoc-ref outputs "out"))
-                     (pages-dir (string-append out "/lib/vscode/out/vs/code/browser/pages/"))
-                     (workbench-html (string-append out "/lib/vscode/out/vs/code/browser/workbench/workbench.html")))
+     (substitute-keyword-arguments (package-arguments code-server)
+       ((#:phases phases)
+        #~(modify-phases #$phases
+(add-after 'wrap 'enable-font-magic
+                    (lambda _
+                    (let ((font-package "font-nerd-fonts-jetbrains-mono")
+                        (font-path "/share/fonts/truetype/")
+                        (font-prefix "JetBrainsMonoNerdFontMono-"))
+                    (use-modules (ice-9 ftw)
+                    (srfi srfi-1)) ; For list processing
+       (define (collect-files-with-prefix directory prefix)
+        (filter (lambda (str) (string-prefix? prefix str)) (cddr (scandir directory))))
+        (map (lambda (entry)
+        (let* ((source (car entry)) (file (cdr entry)))
+            (symlink (string-append  (assoc-ref %build-inputs source) font-path file)
+                (string-append (assoc-ref %outputs "out") "/src/browser/pages/" (basename file)))
+            (system* "sfnt2woff" (string-append (assoc-ref %outputs "out") "/src/browser/pages/" (basename file))) 
+            ))
+        (append
+        (map (lambda (file) (cons font-package file))
+        (collect-files-with-prefix (string-append (assoc-ref %build-inputs font-package) font-path) font-prefix)                  
+        )))
+            (let ((font-files (string-join
+            (map 
+                (lambda (x) 
+                    (string-append "url('_static/src/browser/pages/" (substring x 0 (- (string-length x) 4)) ".woff') format('woff')" ))
+                (collect-files-with-prefix (string-append (assoc-ref %build-inputs font-package) font-path) font-prefix))
+                ","
+            )))
+            (system* "sed" "-i" (string-append "s|</head>|<style> @font-face {font-family: 'Personal';font-style: normal;src:" font-files ";}\\</style></head>|g") (string-append #$output "/lib/vscode/out/vs/code/browser/workbench/workbench.html"))
+        ))))
+              )))))
+)
 
-                ;; Helper to find all the font files in the font package
-                (define (collect-font-files)
-                  (map (lambda (file)
-                         (cons font-pkg-name file))
-                       (filter (lambda (str) (string-prefix? font-prefix str))
-                               (scandir-files font-path))))
-                
-                (let ((font-files-to-process (collect-font-files)))
-                  ;; Create symlinks and convert fonts to woff format
-                  (for-each
-                    (lambda (font-entry)
-                      (let* ((source-file-name (cdr font-entry))
-                             (source-path (string-append font-path source-file-name))
-                             (dest-path (string-append pages-dir source-file-name)))
-                        (symlink source-path dest-path)
-                        (invoke "sfnt2woff" dest-path)))
-                    font-files-to-process)
-                  
-                  ;; Generate the CSS @font-face rule
-                  (let ((font-face-urls
-                         (string-join
-                          (map (lambda (font-entry)
-                                 (let ((woff-file (string-append (basename (cdr font-entry) ".ttf") ".woff")))
-                                   (string-append "url('_static/src/browser/pages/" woff-file "') format('woff')")))
-                               font-files-to-process)
-                          ", ")))
-                    
-                    ;; Inject the CSS into the workbench HTML file
-                    (substitute* workbench-html
-                      (("</head>")
-                       (string-append "<style> @font-face {font-family: 'Personal'; font-style: normal; src: "
-                                      font-face-urls
-                                      ";} </style></head>"))))))))))))
+code-server-with-fonts
