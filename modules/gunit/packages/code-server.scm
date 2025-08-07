@@ -53,4 +53,6 @@
     (synopsis "Code server used for accessing VS Code in the browser.")
     (home-page "https://coder.com/")
     (description "Free open source code server. Use a VS Code in any browser wherever you are.")
-    (license license:mit)))
+    (license license:expat)))
+
+code-server
