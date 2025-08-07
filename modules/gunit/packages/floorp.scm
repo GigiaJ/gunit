@@ -1,5 +1,5 @@
 (define-module (gchannel packages floorp)
-  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module ((nonguix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -62,10 +62,11 @@
   #:use-module (gnu packages vulkan)
 )
 
+
 (define-public floorp
     (package
     (name "floorp")
-    (version "12.0.15")
+    (version "12.0.16")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-amd64.tar.xz"))
@@ -238,7 +239,5 @@
     (home-page "https://floorp.app/")
     (description "Floorp is the first Firefox-based browser to enable UI customization, designed so that anyone can easily
      adjust their browsing experience to their preferences and access the web with ease.")
-    (license
-    (name "floorp-shared-source")
-    (uri "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE")
-    (comment "Floorp Shared Source License: non-commercial use only, modification allowed, no sublicensing, attribution required."))))
+    (license (license:nonfree "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE"))
+))
