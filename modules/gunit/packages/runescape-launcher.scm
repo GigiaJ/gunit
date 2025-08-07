@@ -64,7 +64,7 @@
     (uri (string-append "https://content.runescape.com/downloads/ubuntu/pool/non-free/r/" name "/" name "_" version "_amd64.deb"))
   
         (sha256
-        (base32 "00krw818s15bc38v9qv4ggk32704czjlw9c7vggg3vxxdhxvvscq"))))
+        (base32 "1b4lspdipm0irb3x9ia8g6d1n16qc4y7j8lprm7z3llmkhhdhqlg"))))
     (build-system copy-build-system)
 
     (inputs
@@ -106,9 +106,8 @@
     (home-page "https://www.runescape.com/")
     (description "RuneScape Game Client (NXT)")
     (license
-    (name "runescape-launcher-proprietary")
-    (uri "https://www.jagex.com/en-GB/terms")
-    (comment "Launcher that downloads the proprietary RuneScape client from Jagex. Not redistributable.")))) 
+    (license:nonfree "https://www.jagex.com/en-GB/terms")
+    ))) 
 
     (define steam-client-libs
     `(("at-spi2-core" ,at-spi2-core)      ; Required (often) for SteamVR interface.
