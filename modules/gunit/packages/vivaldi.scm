@@ -114,9 +114,7 @@
                        (symlink chromium-target exe)
                        (wrap-program exe
                        '("CHROME_WRAPPER" = (#$appname))
-                       ))))
-                         
-      )))
+                       )))))))
      (inputs
       (list bzip2
             curl

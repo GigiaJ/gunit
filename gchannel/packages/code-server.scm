@@ -56,8 +56,7 @@
                     (lambda _
                     (let ((font-package "font-nerd-fonts-jetbrains-mono")
                         (font-path "/share/fonts/truetype/")
-                        (font-prefix "JetBrainsMonoNerdFontMono-")  
-                )
+                        (font-prefix "JetBrainsMonoNerdFontMono-"))
                     (use-modules (ice-9 ftw)
                     (srfi srfi-1)) ; For list processing
        (define (collect-files-with-prefix directory prefix)

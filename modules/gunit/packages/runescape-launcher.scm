@@ -1,4 +1,4 @@
-(define-module (gchannel packages runescape-launcher)
+(define-module (gunit packages runescape-launcher)
 #:use-module ((guix licenses) #:prefix license:)
 #:use-module ((nonguix licenses) #:prefix license:)
 #:use-module (guix git-download)
@@ -102,11 +102,13 @@
       
     (native-inputs
         (list unzip dpkg patchelf iputils))
-    (synopsis "Soup")
+    (synopsis "A client for RuneScape")
     (home-page "https://www.runescape.com/")
     (description "RuneScape Game Client (NXT)")
-    (license license:agpl3))) ;; Update license as this is a placeholder
-
+    (license
+    (name "runescape-launcher-proprietary")
+    (uri "https://www.jagex.com/en-GB/terms")
+    (comment "Launcher that downloads the proprietary RuneScape client from Jagex. Not redistributable.")))) 
 
     (define steam-client-libs
     `(("at-spi2-core" ,at-spi2-core)      ; Required (often) for SteamVR interface.
@@ -241,5 +243,3 @@
     (description "Runescape.")))
     
 (define-public runescape (nonguix-container->package runescape-container))
-
-runescape

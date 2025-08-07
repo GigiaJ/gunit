@@ -1,4 +1,4 @@
-(define-module (gchannel packages obs-droidcam)
+(define-module (guint packages obs-plugins)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -11,8 +11,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages image)
-  #:use-module (guix build-system gnu)
-)
+  #:use-module (guix build-system gnu))
 
 (define-public obs-droidcam
     (package
@@ -24,7 +23,6 @@
     (url "https://github.com/dev47apps/droidcam-obs-plugin")
   (commit version)
   (recursive? #t)))
-  
         (sha256
         (base32 "0q4nbfd7xly44psmv2hb3bimcx5mp20vw8z10dqsvrsasy2hnqr9"))))
     (build-system gnu-build-system)
@@ -41,8 +39,7 @@
                     (string-append "LIBIMOBILEDEV=" "libimobiledevice-1.0")
                     (string-append "LIBOBS_INCLUDES=" #$(this-package-input "obs") "/include/obs")
                     (string-append "FFMPEG_INCLUDES=" #$(this-package-input "ffmpeg") "/include")
-                    (string-append "ALLOWSTATIC=" "no")
-                )
+                    (string-append "ALLOWSTATIC=" "no"))
             #:phases
             #~(modify-phases %standard-phases
             (delete 'configure)
@@ -54,16 +51,11 @@
             (mkdir-p (string-append (assoc-ref %outputs "out")  "/lib/obs-plugins"))
             (mkdir-p (string-append (assoc-ref %outputs "out")  "/share/obs/obs-plugins"))
             (invoke "cp" "./build/droidcam-obs.so" (string-append (assoc-ref %outputs "out") "/lib/obs-plugins/droidcam-obs.so"))
-            (invoke "cp" "-r" "./data/locale" (string-append (assoc-ref %outputs "out") "/share/obs/obs-plugins/droidcam-obs")) #t)
-            )
-            )         
-                ))
+            (invoke "cp" "-r" "./data/locale" (string-append (assoc-ref %outputs "out") "/share/obs/obs-plugins/droidcam-obs")) #t)))))
       
     (native-inputs
         (list git pkg-config))
-    (synopsis "Soup")
+    (synopsis "Droidcam OBS plugin")
     (home-page "https://dev47apps.com/obs/")
-    (description "plugin for droidcam obs")
-    (license (license:gpl2))))
-
-obs-droidcam
+    (description "A plugin for OBS to enable droidcam which allows you to use your phone as a webcam (and even a mic). Supports iOS and Android.")
+    (license license:gpl2)))
