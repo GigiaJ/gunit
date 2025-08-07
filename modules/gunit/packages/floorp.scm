@@ -1,5 +1,5 @@
-(define-module (gchannel packages floorp)
-  #:use-module ((guix licenses) #:prefix license:)
+(define-module (gunit packages floorp)
+  #:use-module ((nonguix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
