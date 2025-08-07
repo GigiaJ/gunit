@@ -176,8 +176,8 @@
                        (Name . "Floorp")
                        (GenericName . "Web Browser")
                        (Comment . "Your web, the way you like it")
-                       (Exec . ,exec-path) ;; Precomputed value
-                       (Icon . ,icon-path) ;; Precomputed value
+                       (Exec . ,exec-path)
+                       (Icon . ,icon-path)
                        (Terminal . false)
                        (Type . "Application")
                        (StartupWMClass . "Floorp")
@@ -230,16 +230,15 @@
                     `("MOZ_LEGACY_PROFILES" = ("1"))
                     `("MOZ_ALLOW_DOWNGRADE" = ("1")))
                 )
-                    
             
-            (invoke "mv" (string-append #$output "/lib/floorp/floorp") (string-append #$output "/bin/floorp"))
-            ))
-            )))
+            (invoke "mv" (string-append #$output "/lib/floorp/floorp") (string-append #$output "/bin/floorp")))))))
     (native-inputs
         (list git patchelf))
-    (synopsis "Soup")
-    (home-page "https://coder.com/")
-    (description "Free open source code server")
-    (license license:agpl3)))
-
-floorp
+    (synopsis "A highly customizable Firefox-based (Gecko) browser")
+    (home-page "https://floorp.app/")
+    (description "Floorp is the first Firefox-based browser to enable UI customization, designed so that anyone can easily
+     adjust their browsing experience to their preferences and access the web with ease.")
+    (license
+    (name "floorp-shared-source")
+    (uri "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE")
+    (comment "Floorp Shared Source License: non-commercial use only, modification allowed, no sublicensing, attribution required."))))
