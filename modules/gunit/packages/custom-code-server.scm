@@ -9,7 +9,7 @@
   #:use-module (guix build copy-build-system)
   #:use-module (ice-9 ftw)
   #:use-module (srfi srfi-1)
-  #:use-module (gchannel packages code-server)
+  #:use-module (gunit packages code-server)
   #:use-module (selected-guix-works packages fonts)
   #:use-module (gnu packages fontutils))
 
