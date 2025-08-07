@@ -1,5 +1,3 @@
-;; ~/.config/guix/services/code-server.scm
-
 (define-module (services code-server)
   #:use-module (guix gexp)
   #:use-module (guix packages)
