@@ -2,6 +2,8 @@
   (version 0)
   (url "https://codeberg.org/Gigia/gunit.git")
   (directory "modules")
+  (keyring-reference "keyring")
+  (news-file NEWS)
   (dependencies
     (channel
     (name nonguix)
