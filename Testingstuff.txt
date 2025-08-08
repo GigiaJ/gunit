@@ -1,0 +1,102 @@
+            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libcef.so"))
+            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef/icudtl.dat") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/icudtl.dat"))
+            (symlink (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef/v8_context_snapshot.bin") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/v8_context_snapshot.bin"))
+            (symlink (string-append (assoc-ref %build-inputs "ungoogled-chromium") "/lib/libGLESv2.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libGLESv2.so"))
+            (symlink (string-append (assoc-ref %build-inputs "ungoogled-chromium") "/lib/libEGL.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libEGL.so"))
+            (symlink (string-append (assoc-ref %build-inputs "ungoogled-chromium") "/lib/libvulkan.so.1") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libvulkan.so.1"))
+            (symlink (string-append (assoc-ref %build-inputs "ungoogled-chromium") "/lib/libvk_swiftshader.so") (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/libvk_swiftshader.so"))
+
+GUIX_PROFILE="/home/jaggar/.guix-profile" . "$GUIX_PROFILE/etc/profile"
+
+Need to feed the library path
+LD_LIBRARY_PATH=/gnu/store/qgx6b50cak3p7k9m148fy7jnp637nwj2-gcc-14.2.0-lib/lib:/gnu/store/dqryg46gk63hwg29p930dc4yv5ff87dc-libglvnd-1.7.0/lib:/gnu/store/2cxn6fkw8bi2c9wfa5pyxkva9avvzqg6-sdl2-2.30.8/lib:/gnu/store/vi0sgchlqsnvxkklrnfcybc74vy6xv64-gtk+-2.24.33/lib:/gnu/store/2rlxzk2rjdg33li74pyfkq0qnd0xxrsl-libsm-1.2.5/lib:/gnu/store/6blw37lga14hj5cw05xpzf494z5li58s-openssl-1.1.1u/lib:$LD_LIBRARY_PATH
+
+Need to patch the interpreter
+patchelf --set-interpreter /gnu/store/0vhynz1afwvpmdqs3gxg7rj8dwbiill8-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Documents/rs3
+
+patchelf --set-interpreter /gnu/store/0vhynz1afwvpmdqs3gxg7rj8dwbiill8-glibc-2.39/lib/ld-linux-x86-64.so.2 /gnu/store/357cgvwl4ilzr23dx9zxpx4mif0nxfvy-runescape-launcher-2.2.11/usr/share/games/runescape-launcher/runescape
+
+/gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39
+
+patchelf --set-interpreter /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/ld-linux-x86-64.so.2 /home/jaggar/Jagex/launcher/rs2client --set-rpath /gnu/store/hw6g2kjayxnqi8rwpnmpraalxi0djkxc-glibc-2.39/lib/
+/var/bamboo-home/bamboo-home-02/xml-data/build-dir/NXT-BUIL5540-BLR/devplatform/3rdPartyLibs/cpp/wxWidgets/lib/linux/Release
+strings ./rs2client | grep GLIBC
+
+Needed to run RS3
+gnome-themes-extra
+
+
+readelf -d /home/jaggar/Jagex/launcher/rs2client
+
+
+
+debugging
+
+gdb
+valgrind
+
+
+
+Clean up your package builds with garbage collection occasionally, otherwise you might see old builds and weird build issues.
+(add-before 'configure 'set-env-vars         
+    (lambda _
+        (setenv "BOLT_CEF_DLLWRAPPER" (string-append (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef_dll_wrapper.a"))
+        ;;(putenv "CATS=NOTDOGS")
+        (display (environ))
+        (display "Test")
+        #t))
+        ;; (replace 'configure (lambda _ (display (environ)) #t))
+        )
+
+
+Back-up info
+https://guix.gnu.org/manual/en/html_node/Replicating-Guix.html
+
+
+
+
+
+(source (let ((ffmpeg-origin (package-source ffmpeg)))
+              (origin
+                (inherit ffmpeg-origin)
+                ;; These patches originate come from
+                ;; <https://review.jami.net/plugins/gitiles/jami-daemon/+/refs/heads/master/contrib/src/ffmpeg/>.
+                ;; Make sure to keep them update and/or register any new ones
+                ;; here.
+                (patches
+                 (append
+                  (origin-patches ffmpeg-origin)
+                  (search-patches
+                   "ffmpeg-jami-remove-mjpeg-log.patch"
+                   "ffmpeg-jami-change-RTCP-ratio.patch"
+                   "ffmpeg-jami-rtp_ext_abs_send_time.patch"
+                   "ffmpeg-jami-libopusdec-enable-FEC.patch"
+                   "ffmpeg-jami-libopusenc-reload-packet-loss-at-encode.patch"
+                   "ffmpeg-jami-screen-sharing-x11-fix.patch"
+                   "ffmpeg-jami-pipewiregrab-source-filter.patch"))))))
+
+
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/badlogic/orfondl")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0h1zcxxhvshbc3gkmr33npki6sdjh79haack1cci9k40a0gk144v"))
+              (modules '((guix build utils)))
+              (snippet '(begin
+                          ;; Delete prebuilt binary file.
+                          (delete-file "orfondl")))))
+
+
+port Conky over
+
+
+
+
+Discord needs 
+--no-sandbox --no-gpu --in-process-gpu ./EXECUTABLE
+https://peter.sh/experiments/chromium-command-line-switches/
+Probably unstable and we should address it
