@@ -4,7 +4,7 @@ Channel declaration:
 ```
 (channel
     (name 'gunit)
-    (url "https://github.com/GigiaJ/gunit.git")
+    (url "https://codeberg.org/Gigia/gunit.git")
     (branch "channel")
     (make-channel-introduction
         "efaf0735519c85579b04baa0fb07d727aa55b128"
