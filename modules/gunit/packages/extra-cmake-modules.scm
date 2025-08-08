@@ -1,4 +1,4 @@
-(define-module (gchannel packages extra-cmake-modules)
+(define-module (gunit packages extra-cmake-modules)
   #:use-module (guix build-system cmake)
   #:use-module (guix build-system python)
   #:use-module (guix build-system qt)

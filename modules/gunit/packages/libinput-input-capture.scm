@@ -1,4 +1,4 @@
-(define-module (gchannel packages libinput-input-capture)
+(define-module (gunit packages libinput-input-capture)
   #:use-module (guix bzr-download)
   #:use-module (guix download)
   #:use-module (guix gexp)

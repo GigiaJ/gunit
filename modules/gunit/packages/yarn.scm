@@ -1,7 +1,7 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;; Copyright © 2024 Giacomo Leidi <goodoldpaul@autistici.org>
 
-(define-module (gchannel packages yarn)
+(define-module (gunit packages yarn)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages node)

@@ -1,4 +1,4 @@
-(define-module (gchannel packages xdg-desktop-portal)
+(define-module (gunit packages xdg-desktop-portal)
 
   #:use-module (guix bzr-download)
   #:use-module (guix download)
@@ -17,8 +17,8 @@
   #:use-module (guix build-system qt)
   #:use-module (gnu packages)
   #:use-module (gnu packages acl)
-  #:use-module (gchannel packages extra-cmake-modules)
-  #:use-module (gchannel packages libportal)
+  #:use-module (gunit packages extra-cmake-modules)
+  #:use-module (gunit packages libportal)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages avahi)

@@ -1,4 +1,4 @@
-(define-module (gchannel packages python-xyz)
+(define-module (gunit packages python-xyz)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (gnu packages)
   #:use-module (gnu packages adns)

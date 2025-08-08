@@ -1,4 +1,4 @@
-(define-module (gchannel packages hyprland-protocols-input-capture)
+(define-module (gunit packages hyprland-protocols-input-capture)
   #:use-module (guix bzr-download)
   #:use-module (guix download)
   #:use-module (guix gexp)

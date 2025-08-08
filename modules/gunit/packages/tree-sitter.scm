@@ -1,4 +1,4 @@
-(define-module (gchannel packages tree-sitter)
+(define-module (gunit packages tree-sitter)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)

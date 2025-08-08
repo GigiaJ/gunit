@@ -1,5 +1,5 @@
 
-(define-module (gchannel packages libp11)
+(define-module (gunit packages libp11)
   #:use-module (gnu packages)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
