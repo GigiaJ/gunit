@@ -1,5 +1,18 @@
 My *personal* channel where I build packages and service I use for GNU/Guix.
 
+Channel declaration:
+```
+(channel
+    (name 'gunit)
+    (url "https://github.com/GigiaJ/gunit.git")
+    (branch "channel")
+    (make-channel-introduction
+        "efaf0735519c85579b04baa0fb07d727aa55b128"
+    (openpgp-fingerprint
+          "AE6F 7F0F 6E0D AFB9 6E84  8994 C3A7 E8D7 2261 8435")))
+```
+
+
 ## Packages
 - **Browsers**
   - Microsoft Edge
