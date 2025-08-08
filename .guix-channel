@@ -1,6 +1,6 @@
 (channel
   (version 0)
-  (url "https://github.com/GigiaJ/gunit.git")
+  (url "https://codeberg.org/Gigia/gunit.git")
   (directory "modules")
   (dependencies
     (channel
