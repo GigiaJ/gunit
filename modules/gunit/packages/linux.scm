@@ -1,4 +1,4 @@
-(define-module (guint packages linux)
+(define-module (gunit packages linux)
   #:use-module (guix packages)
   #:use-module (guix git-download)
   #:use-module (guix gexp)

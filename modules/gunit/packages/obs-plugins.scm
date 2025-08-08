@@ -1,4 +1,4 @@
-(define-module (guint packages obs-plugins)
+(define-module (gunit packages obs-plugins)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
