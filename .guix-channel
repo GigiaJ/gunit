@@ -3,6 +3,7 @@
   (url "https://codeberg.org/Gigia/gunit.git")
   (directory "modules")
   (keyring-reference "keyring")
+  (news-file ".guix-news")
   (news-file NEWS)
   (dependencies
     (channel
