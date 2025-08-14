@@ -4,7 +4,6 @@
   (directory "modules")
   (keyring-reference "keyring")
   (news-file ".guix-news")
-  (news-file NEWS)
   (dependencies
     (channel
     (name nonguix)
