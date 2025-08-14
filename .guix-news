@@ -1,7 +1,7 @@
 (channel-news
  (version 0)
   (entry                                
-  (commit "a07e3eb45dc5c5b600f373d6b2ed20e0f1323795")
+  (commit "827cb18e3616b7ea67668f2569ef1530dd420eab")
   (title (en "Revised for general release")
          (eo "Reviziita por ĝenerala liberigo"))
   (body (en "Channel revised to be streamlined, signed, and more appropriate for general usage.")
