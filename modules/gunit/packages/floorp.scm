@@ -6,7 +6,6 @@
   #:use-module (gnu packages)
   #:use-module (guix build-system copy)
   #:use-module (guix build copy-build-system)
-
   #:use-module (gnu packages)
   #:use-module (gnu packages assembly)
   #:use-module (gnu packages audio)
@@ -16,7 +15,6 @@
   #:use-module (gnu packages cdrom)
   #:use-module (gnu packages commencement)
   #:use-module (gnu packages compression)
-  #:use-module (gnu packages crates-io)
   #:use-module (gnu packages cups)
   #:use-module (gnu packages elf)
   #:use-module (gnu packages fontutils)
@@ -66,7 +64,7 @@
 (define-public floorp
     (package
     (name "floorp")
-    (version "12.2.0")
+    (version "12.8.3")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-amd64.tar.xz"))
