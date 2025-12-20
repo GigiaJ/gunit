@@ -67,7 +67,7 @@
     (version "12.8.3")
     (source (origin
     (method url-fetch)
-    (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-amd64.tar.xz"))
+    (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-x86_64.tar.xz"))
         (sha256
         (base32 "159fqn6a0ws307dr216bnhwa0g23j6rnf0b1p1yb3fwjyvc96m3f"))))
     (build-system copy-build-system)
