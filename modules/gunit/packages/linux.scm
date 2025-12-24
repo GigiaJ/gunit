@@ -1,4 +1,4 @@
-(define-module (gunit packages linux)
+(define-module (guint packages linux)
   #:use-module (guix packages)
   #:use-module (guix git-download)
   #:use-module (guix gexp)
@@ -68,15 +68,23 @@ to enable support for the Apple T2 security chip and related hardware.")
         #~(modify-phases #$phases
             (add-after 'unpack 'apply-t2-patches
   (lambda* (#:key inputs #:allow-other-keys)
-    (use-modules (guix build utils))
-    (let ((patch-dir (assoc-ref inputs "t2-patches")))
-      (let ((patch-files (find-files patch-dir "\\.patch$")))
-        (format #t "Applying ~a T2 patches...~%" (length patch-files))
-        (for-each
-         (lambda (patch)
-           (invoke "patch" "-p1" "-i" patch))
-         (sort patch-files string<))
-        #t))))))
-       ((#:kernel-config config)
+    (use-modules (guix build utils)
+                 (srfi srfi-1))
+    (let* ((patch-dir (assoc-ref inputs "t2-patches"))
+           (all-patches (find-files patch-dir "\\.patch$"))
+           (redundant-patches '("1014" "1015" "1016" "4001" "4004" "4006"))
+           (patches-to-apply 
+            (remove (lambda (file)
+                      (any (lambda (num) (string-contains file num))
+                           redundant-patches))
+                    all-patches)))
+      (format #t "Applying ~a T2 patches (skipping redundant ones)...~%" 
+              (length patches-to-apply))
+      (for-each
+       (lambda (patch)
+         (invoke "patch" "-p1" "-i" patch))
+       (sort patches-to-apply string<))
+      #t)))))
+    ((#:kernel-config config)
         #~(kernel-config-union #$config
            (kernel-config #:configs (mbp-t2-extra-options))))))))
