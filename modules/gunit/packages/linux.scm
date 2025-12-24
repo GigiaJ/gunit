@@ -88,3 +88,6 @@ to enable support for the Apple T2 security chip and related hardware.")
     ((#:kernel-config config)
         #~(kernel-config-union #$config
            (kernel-config #:configs (mbp-t2-extra-options))))))))
+
+
+linux-kernel-mbp-t2
