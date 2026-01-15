@@ -25,7 +25,7 @@
                     (commit version)
                     (recursive? #t)))
               (sha256
-               (base32 "0q4nbfd7xly44psmv2hb3bimcx5mp20vw8z10dqsvrsasy2hnqr9"))))
+               (base32 "1kkiijl25safjw7l7qp4yddba9mdhig3a0af5nx3zq2hbszvy4c7"))))
     (build-system gnu-build-system)
 
     (inputs
@@ -72,3 +72,5 @@
     (home-page "https://dev47apps.com/obs/")
     (description "A plugin for OBS to enable droidcam which allows you to use your phone as a webcam (and even a mic). Supports iOS and Android.")
     (license license:gpl2)))
+  
+obs-droidcam
