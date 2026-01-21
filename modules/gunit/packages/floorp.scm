@@ -62,182 +62,131 @@
 
 
 (define-public floorp
-    (package
+  (package
     (name "floorp")
     (version "12.10.2")
     (source (origin
-    (method url-fetch)
-    (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-x86_64.tar.xz"))
-        (sha256
-        (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
+              (method url-fetch)
+              (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" 
+                                  version "/floorp-linux-x86_64.tar.xz"))
+              (sha256
+               (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
     (build-system copy-build-system)
-
     (inputs
-        (list 
-        alsa-lib
-        gcc-toolchain
-        bash-minimal
-        eudev
-        libnotify
-        libpng-apng
-        libva
-        mesa
-        pipewire
-        pulseaudio
-        glibc
-        gtk+
-        libdrm
-        llvm-for-mesa
-        expat
-        zlib
-        zstd
-        spirv-tools
-        libxcb
-        libxshmfence
-        elfutils
-        libx11
-        wayland
-        libxext
-        libxxf86vm
-        ffmpeg
-        libvpx
-        libwebp
-        xz
-        dav1d
-        libaom
-        lame
-        opus
-        rav1e
-        speex
-        svt-av1
-        libtheora
-        libogg
-        twolame
-        libvorbis
-        libx264
-        x265
-        xvid
-        soxr
-        libvdpau
-        sdl2
-        openal
-        libcdio-paranoia
-        libcdio
-        libcaca
-        libass
-        vidstab
-        fontconfig
-        freetype
-        bzip2
-        libbluray
-        gnutls
-        pciutils
-    ))
-        (arguments
-        (list
-            #:install-plan #~'(("." "lib/floorp"))
-            #:phases
-            #~(modify-phases %standard-phases
-                (delete 'validate-runpath) ;; Technically we could patch the shared libs, but it isn't needed.
-                (add-after 'install 'patch-interpreter
-                  (lambda* (#:key native-inputs inputs outputs #:allow-other-keys)
-                    (let* ((out (assoc-ref outputs "out"))
-                           (interpreter (string-append (assoc-ref inputs "glibc")
-                                                       "/lib/ld-linux-x86-64.so.2"))
-                           (binary (string-append out "/lib/floorp/floorp")))
-                      (invoke "patchelf" "--set-interpreter" interpreter binary))))
-                (add-after 'patch-interpreter 'create
-                    (lambda _
-                        (mkdir-p (string-append  #$output "/bin"))
-                        ;;(mkdir-p (string-append  #$output "/share/icons/hicolor"))
-                    )
-                )
-                (add-after 'create 'install-icons
-                (lambda _
-                    (let ((icons (string-append #$output "/share/icons/hicolor"))
-                        (share (string-append #$output "/lib/floorp/browser/chrome/icons")))
-                        (for-each (lambda (icon)
-                                    (let* ((icon-name (basename icon))
-                                        (icon-size (string-drop-right (string-drop icon-name 7) 4))
-                                        (target (string-append icons "/" icon-size "x" icon-size "/apps/" "floorp" ".png")))
-                                    (mkdir-p (dirname target))
-                                    (rename-file icon target)))
-                                (find-files share "default.*\\.png")))
-                )
-                )
-                (add-after 'install-icons 'install-share
-                    (lambda _
-                        (display "cat")
-                        (let* ((exec-path (string-append #$output "/bin/floorp %u"))
-                        (icon-path (string-append #$output "/share/icons/hicolor/128x128/apps/floorp.png")))
-                   (define desktop-entry
-                     `((Version . "1.0")
-                       (Name . "Floorp")
-                       (GenericName . "Web Browser")
-                       (Comment . "Your web, the way you like it")
-                       (Exec . ,exec-path)
-                       (Icon . ,icon-path)
-                       (Terminal . false)
-                       (Type . "Application")
-                       (StartupWMClass . "Floorp")
-                       (MimeType . "text/html;text/xml;application/xhtml+xml;text/mml;x-scheme-handler/http;x-scheme-handler/https;")
-                       (Startup-Notify . true)
-                       (X-MultipleArgs . false)
-                       (X-Desktop-File-Install-Version . "0.16")
-                       (Categories . "Network;WebBrowser;")
-                       (Encoding . "UTF-8")))
-                 
-                   (define (write-desktop-entry file-name entry)
-                        (call-with-output-file file-name
-                            (lambda (port)
-                            (format port "[Desktop Entry]~%")
-                            (for-each
-                            (lambda (field)
-                                (format port "~a=~a~%" (car field) (cdr field)))
-                            entry))))
+     (list 
+     alsa-lib
+           bash-minimal
+           eudev
+           libnotify
+           libva
+           mesa
+           pipewire
+           pulseaudio
+           glibc
+           gtk+
+           libdrm
+           llvm-for-mesa
+           expat
+           zlib
+           zstd
+           elfutils
+           wayland
+           ffmpeg
+           libvpx
+           libwebp
+           xz
+           dav1d
+           libaom
+           lame
+           opus
+           rav1e
+           speex
+           svt-av1
+           libtheora
+           libogg
+           twolame
+           libvorbis
+           libx264
+           x265
+           xvid
+           soxr
+           libvdpau
+           sdl2
+           openal
+           libcaca
+           libass
+           fontconfig
+           freetype
+           bzip2
+           libbluray
+           gnutls
+           pciutils
+           gcc-toolchain
+           pango
+           cairo
+           gdk-pixbuf
+           atk
+           cups
+           libcanberra
+           dbus-glib
+           dbus
+           libx11
+           libxcb
+           libxcomposite
+           libxcursor
+           libxdamage
+           libxext
+           libxfixes
+           libxi
+           libxrandr
+           libxrender
+           libxtst
+           libxxf86vm
+           ))
+    (arguments
+     (list
+      #:install-plan #~'(("." "lib/floorp"))
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'validate-runpath)
+          (add-after 'install 'patch-interpreters
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (lib (string-append out "/lib/floorp"))
+                     (interpreter (string-append (assoc-ref inputs "glibc")
+                                                 "/lib/ld-linux-x86-64.so.2")))
+                (for-each (lambda (binary)
+                            (invoke "patchelf" "--set-interpreter" interpreter binary))
+                          (find-files lib "^(floorp|glxtest|vaapitest|plugin-container|minidump-analyzer|updater|pingsender)$")))))
 
-                        (mkdir-p (string-append #$output "/share/applications"))
-                        (write-desktop-entry (string-append #$output "/share/applications/" "floorp.desktop") desktop-entry))
-                    )
-                )
-                (add-after 'create 'wrap
-                (lambda* (#:key inputs outputs #:allow-other-keys)
-                (let* ((out (assoc-ref outputs "out"))
-                       (lib (string-append out "/lib/floorp"))
-                       (libs (map
-                              (lambda (lib-name)
-                                (string-append (assoc-ref inputs
-                                                          lib-name)
-                                               "/lib"))
-                              '(
-                                "alsa-lib" "libpng-apng" "libva" "mesa" "pipewire" "pulseaudio" "glibc"
-                                "gcc-toolchain" "libdrm" "llvm-for-mesa" "expat" "zlib" "zstd" "spirv-tools"
-                                "libxcb" "libxshmfence" "elfutils" "libx11" "wayland" "libxext" "libxxf86vm"
-                                "ffmpeg" "libvpx" "libwebp" "xz" "dav1d" "libaom" "lame" "opus" "rav1e"
-                                "speex" "svt-av1" "libtheora" "libogg" "twolame" "libvorbis" "libx264"
-                                "x265" "xvid" "soxr" "libvdpau" "sdl2" "openal" "libcdio-paranoia"
-                                "libcdio" "libcaca" "libass" "vidstab" "fontconfig-minimal" "freetype"
-                                "bzip2" "libbluray" "gnutls" "gtk+" "pciutils"
-                            )))
-                              (gtk-share (string-append (assoc-ref inputs "gtk+") "/share")))
-                   (display libs)
-                  (wrap-program (car (find-files lib "^glxtest$"))
-                    `("LD_LIBRARY_PATH" prefix ,libs))
-                (wrap-program (car (find-files lib "^floorp$"))
-                    `("LD_LIBRARY_PATH" prefix (,@libs))
-                    `("XDG_DATA_DIRS" prefix (,gtk-share))
-                    `("MOZ_LEGACY_PROFILES" = ("1"))
-                    `("MOZ_ALLOW_DOWNGRADE" = ("1")))
-                )
-            
-            (invoke "mv" (string-append #$output "/lib/floorp/floorp") (string-append #$output "/bin/floorp")))))))
-    (native-inputs
-        (list git patchelf))
+          (add-after 'patch-interpreters 'wrap-binary
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (bin (string-append out "/bin"))
+                     (lib (string-append out "/lib/floorp"))
+                     ;; FIX: Map EVERY input to the LD_LIBRARY_PATH
+                     (libs (map (lambda (input)
+                                  (string-append (assoc-ref inputs input) "/lib"))
+                                '("alsa-lib" "libva" "mesa" "pipewire" "pulseaudio" "glibc"
+                                  "gtk+" "libdrm" "pciutils" "ffmpeg" "wayland" 
+                                  "gcc-toolchain" "eudev" "glib" "dbus" "dbus-glib"
+                                  "pango" "cairo" "gdk-pixbuf" "atk" "cups" "libcanberra"
+                                  "libx11" "libxcb" "libxcomposite" "libxcursor" "libxdamage" 
+                                  "libxext" "libxfixes" "libxi" "libxrandr" "libxrender" 
+                                  "libxtst" "libxxf86vm"))) 
+                     (mesa-dri (string-append (assoc-ref inputs "mesa") "/lib/dri")))
+                (mkdir-p bin)                
+                (wrap-program (string-append lib "/floorp")
+                  `("LD_LIBRARY_PATH" prefix ,libs)
+                  `("LIBVA_DRIVERS_PATH" = (,mesa-dri))
+                  `("MOZ_ENABLE_WAYLAND" = ("1"))
+                  `("MOZ_DISABLE_RDD_SANDBOX" = ("1")))
+                (symlink (string-append lib "/floorp")
+                         (string-append bin "/floorp"))))))))
+
+    (native-inputs (list git patchelf))
     (synopsis "A highly customizable Firefox-based (Gecko) browser")
     (home-page "https://floorp.app/")
-    (description "Floorp is the first Firefox-based browser to enable UI customization, designed so that anyone can easily
-     adjust their browsing experience to their preferences and access the web with ease.")
-    (license (license:nonfree "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE"))
-))
-
-floorp
+    (description "Floorp is the first Firefox-based browser to enable UI customization.")
+        (license (license:nonfree "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE"))))
+    floorp
