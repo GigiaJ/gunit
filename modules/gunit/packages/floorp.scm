@@ -64,12 +64,12 @@
 (define-public floorp
     (package
     (name "floorp")
-    (version "12.8.3")
+    (version "12.10.2")
     (source (origin
     (method url-fetch)
     (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" version "/floorp-linux-x86_64.tar.xz"))
         (sha256
-        (base32 "0p93pqxlvzy95vg72rflqyyydcnahzmkjxrl7naxxp2gb3444rhf"))))
+        (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
     (build-system copy-build-system)
 
     (inputs
