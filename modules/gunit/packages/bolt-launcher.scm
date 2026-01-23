@@ -125,12 +125,12 @@
 (define bolt-launcher-client
     (package
     (name "bolt-launcher")
-    (version "0.11.0")
+    (version "0.20.6")
     (source (origin
     (method git-fetch)
     (uri (git-reference
-    (url "https://github.com/Adamcake/Bolt")
-  (commit "1720eb0758221d9cd79abddf613d7335ed05e032")
+    (url "https://codeberg.org/Adamcake/Bolt")
+  (commit "542b0d72b90844df909d4c93c0ea75d295ae0c7c")
   (recursive? #t)))
   
         (sha256
