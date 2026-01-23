@@ -21,12 +21,18 @@
   #:use-module (gnu packages chromium)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages compression)
+  #:use-module (gnu packages cups)
   #:use-module (gnu packages curl)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages documentation)
+  #:use-module (gnu packages elf)
   #:use-module (gnu packages engineering)
+  #:use-module (gnu packages file)
   #:use-module (gnu packages fltk)
   #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages fontutils)
+  #:use-module (gnu packages fonts)
+  #:use-module (gnu packages gawk)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages gd)
   #:use-module (gnu packages geo)
@@ -38,6 +44,7 @@
   #:use-module (gnu packages golang)
   #:use-module (gnu packages golang-xyz)
   #:use-module (gnu packages gps)
+  #:use-module (gnu packages graphics)
   #:use-module (gnu packages graphviz)
   #:use-module (gnu packages gstreamer)
   #:use-module (gnu packages gtk)
@@ -47,7 +54,10 @@
   #:use-module (gnu packages jemalloc)
   #:use-module (gnu packages libedit)
   #:use-module (gnu packages libusb)
+  #:use-module (gnu packages libbsd)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages lsof)
+  #:use-module (gnu packages llvm)
   #:use-module (gnu packages logging)
   #:use-module (gnu packages lua)
   #:use-module (gnu packages man)
@@ -58,6 +68,7 @@
   #:use-module (gnu packages networking)
   #:use-module (gnu packages nss)
   #:use-module (gnu packages openstack)
+  #:use-module (gnu packages pciutils)
   #:use-module (gnu packages perl)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages popt)
@@ -66,6 +77,7 @@
   #:use-module (gnu packages pretty-print)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-build)
+  #:use-module (gnu packages onc-rpc)
   #:use-module (gnu packages python-check)
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-web)
@@ -86,6 +98,7 @@
   #:use-module (gnu packages vulkan)
   #:use-module (gnu packages video)
   #:use-module (gnu packages web)
+  #:use-module (gnu packages icu4c)
   #:use-module (gnu packages wxwidgets)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xdisorg)
@@ -104,9 +117,12 @@
   #:use-module (guix base16)
   #:use-module (nongnu packages chromium)
   #:use-module (nongnu packages editors)
+  #:use-module (nonguix build-system binary)
+  #:use-module (nonguix multiarch-container)
+  #:use-module (nonguix utils)
 )
 
-(define-public bolt-launcher
+(define bolt-launcher-client
     (package
     (name "bolt-launcher")
     (version "0.11.0")
@@ -123,10 +139,10 @@
 
     (inputs
         (list 
-        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils hicolor-icon-theme nss fmt spng mesa vulkan-loader vscodium wayland))
+        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils libxshmfence hicolor-icon-theme nss fmt spng mesa vulkan-loader wayland))
         (arguments
         (list
-        #:tests? #f             ; no check target
+        #:tests? #f 
         #:configure-flags
                 #~(list
                     ;; Can probably clean this up
@@ -151,14 +167,34 @@
                     (let* ((source (car entry)) (file (cdr entry)))
                     (symlink (string-append (assoc-ref %build-inputs source) file)
                             (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/" (basename file)))))
-                    (append
-                    (map (lambda (file) (cons "chromium-embedded-framework" file))
-                        '("/lib/libcef.so" "/share/cef/icudtl.dat" "/share/cef/v8_context_snapshot.bin"))
-                    (map (lambda (file) (cons "vscodium" file))
-                        '("/opt/vscodium/libGLESv2.so" "/opt/vscodium/libEGL.so"
-                        "/opt/vscodium/libvulkan.so.1" "/opt/vscodium/libvk_swiftshader.so"))))
+                    
+                    
+(append
+  ;; CEF files
+  (map (lambda (file)
+         (cons "chromium-embedded-framework" file))
+       '("/lib/libcef.so"
+         "/share/cef/icudtl.dat"
+         "/share/cef/v8_context_snapshot.bin"))
+
+  ;; Mesa GL/EGL/GLES/Vulkan
+  (map (lambda (file)
+         (cons "mesa" file))
+       '("/lib/libGL.so.1"
+         "/lib/libEGL.so.1"
+         "/lib/libGLESv2.so.2"
+         "/lib/libvulkan.so.1"))
+)
+
+                        
+                    )
 
                 (wrap-program (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt")
+                `("LD_PRELOAD" ":" prefix (
+                    ,(string-append #$(this-package-input "mesa") "/lib/libGL.so.1")
+                    ,(string-append #$(this-package-input "mesa") "/lib/libEGL.so.1")
+                    ,(string-append #$(this-package-input "mesa") "/lib/libGLESv2.so.2")
+                    ,(string-append #$(this-package-input "mesa") "/lib/libvulkan.so.1")))
                 `("LD_LIBRARY_PATH" ":" prefix (
                     ,(string-append #$(this-package-input "mesa") "/lib")
                     ,(string-append #$(this-package-input "eudev") "/lib")
@@ -167,10 +203,134 @@
                     ,(string-append #$(this-package-input "gtk") "/share")))
                 `("PATH" ":" prefix (
                     ,(string-append #$(this-package-input "xdg-utils") "/bin"))))
-                (invoke "mv" (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt") (string-append (assoc-ref %outputs "out") "/bin/bolt"))
+                
+                    (invoke "mv" (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt") (string-append (assoc-ref %outputs "out") "/bin/bolt"))
              #t)))))
     (native-inputs (list cmake git wayland))
     (synopsis "An alternative third-party open-source launcher for RuneScape or Old School RuneScape.")
     (home-page "https://bolt.adamcake.com/")
     (description "Free open-source third-party implementation of the Jagex Launcher.")
     (license license:agpl3)))
+
+(define bolt-launcher-libs
+    `(("at-spi2-core" ,at-spi2-core)      ; Required (often) for bolt-launcherVR interface.
+      ("bash" ,bash)                      ; Required for bolt-launcher startup.
+      ("cairo", cairo)
+      ("coreutils" ,coreutils)
+      ("diffutils" ,diffutils)
+      ("dbus-glib" ,dbus-glib)            ; Required for bolt-launcher browser.
+      ("elfutils" ,elfutils)              ; Required for capturing library dependencies in pv.
+      ("eudev" ,eudev)                    ; Required for bolt-launcherwebhelper/heavy runtime.
+      ("expat" ,expat)                    ; Needed for RS3
+      ("fontconfig" ,fontconfig)          ; Required for bolt-launcher client.
+      ("file" ,file)                      ; Used for bolt-launcher installation.
+      ("find" ,findutils)                 ; Required at least for some logging.
+      ("fmt" ,fmt)                 ; Needed for RS3
+      ("font-google-noto" ,font-google-noto) ; Not required but to match following fonts.
+      ;; These next three fonts are to cover emoji and Chinese/Japanese/Korean
+      ;; and related scripts.
+      ("font-google-noto-emoji" ,font-google-noto-emoji)
+      ("font-google-noto-sans-cjk" ,font-google-noto-sans-cjk)
+      ("font-google-noto-serif-cjk" ,font-google-noto-serif-cjk)
+      ("freetype" ,freetype)              ; Required for bolt-launcher login.
+      ("bzip2" ,bzip2)        ; CRITICAL: Cache decompression
+      ("curl" ,curl)          ; CRITICAL: Asset streaming
+      ("libxtst" ,libxtst)    ; CRITICAL: Input handling
+      ("libxscrnsaver" ,libxscrnsaver) ; Recommended: Idle detection
+      ("gawk" ,gawk)
+      ("gdk-pixbuf" ,gdk-pixbuf)          ; Required for bolt-launcher tray icon.
+      ;; Required for bolt-launcher startup; use newer version for better compatibility
+      ;; with some games like Dwarf Fortress.
+      ("gcc:lib" ,gcc-14 "lib")
+      ("glib" ,glib)
+      ("glibc" ,glibc)
+      ("grep" ,grep)
+      ("gtk+" ,gtk+)
+      ("gtk" ,gtk+-2)
+      ("libbsd" ,libbsd)
+      ("libcap" ,libcap)                  ; Required for bolt-launcherVR, but needs pkexec too.
+      ("libdrm" ,libdrm)                  ; Needed for RS3
+      ("libglvnd" ,libglvnd)
+      ("libusb" ,libusb)                  ; Required for bolt-launcherVR.
+      ("libsm" ,libsm)
+      ("libxcb" ,libxcb)                  ; Needed for RS3
+      ("libxcomposite" ,libxcomposite)    ; Needed for RS3
+      ("libxext" ,libxext)    ; Needed for RS3
+      ("libxkbcommon" ,libxkbcommon)    ; Needed for RS3
+      ("libva" ,libva)                    ; Required for hardware video encoding/decoding.
+      ("libvdpau" ,libvdpau)              ; Required for hardware video encoding/decoding.
+      ("libvdpau-va-gl" ,libvdpau-va-gl)  ; Additional VDPAU support.
+      ("libx11" ,libx11)
+      ("libxdamage" ,libxdamage)          ; Needed for RS3
+      ("libxfixes" ,libxfixes)            ; Needed for RS3
+      ("libxxf86vm" ,libxxf86vm)
+      ("zstd:lib" ,zstd "lib")
+      ("libnsl" ,libnsl)
+      ("libpng" ,libpng)
+      ("icu4c" ,icu4c)
+      ("llvm" ,llvm-for-mesa)             ; Required for mesa.
+      ("lsof" ,lsof)                      ; Required for some friend's list actions.
+      ("mesa" ,mesa)                      ; Required for bolt-launcher startup.
+      ("nspr" ,nspr)                      ; Required for RS3
+      ("nss-certs" ,nss-certs)            ; Required for bolt-launcher login.
+      ("nss" ,nss)                        ; Needed for RS3
+      ("pango" ,pango)
+      ("pciutils" ,pciutils)              ; Tries to run lspci at bolt-launcher startup.
+      ("procps" ,procps)
+      ("openssl" ,openssl-1.1)
+      ("sed" ,sed)
+      ("sdl2" ,sdl2)
+      ("tar" ,tar)
+      ("usbutils" ,usbutils)              ; Required for bolt-launcherVR.
+      ("util-linux" ,util-linux)          ; Required for bolt-launcher login.
+("vulkan-loader" ,vulkan-loader)   ; <--- ADD THIS
+      ("libxshmfence" ,libxshmfence)     ; <--- ADD THIS
+      ("cups" ,cups)
+      ("wayland" ,wayland)                ; Required for mesa vulkan (e.g. libvulkan_radeon).
+      ("libxcursor" ,libxcursor)            ; Often needed for custom game cursors.
+      ("libxrandr" ,libxrandr)              ; Essential for changing resolutions/fullscreen.
+      ("libxi" ,libxi)                      ; Input extension (gaming mice/tablets).
+      ("xdg-user-dirs" ,xdg-user-dirs)    ; Suppress warning of missing xdg-user-dir.
+      ("flatpak-xdg-utils" ,flatpak-xdg-utils)
+      ("xz" ,xz)
+      ("zenity" ,zenity)
+      ("zlib" ,zlib)
+      ("alsa-lib" ,alsa-lib)              ; Required for audio in most games.
+      ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio") ; Required for audio in most games.
+      ("font-dejavu" ,font-dejavu)
+      ("font-liberation" ,font-liberation)
+      ("imgui" ,imgui-1.86)               ; Required for MangoHud.
+      ("mangohud" ,mangohud)
+      ("openal" ,openal)                  ; Prevents corrupt audio in Crypt of the Necrodancer.
+      ("pulseaudio" ,pulseaudio)          ; Prevents corrupt audio in Sven Coop.
+      ("python" ,python)                  ; Required for KillingFloor2 and Wreckfest.
+      ("spdlog" ,spdlog)
+    ))                ; Required for progress dialogs.
+
+(define bolt-launcher-ld.so.conf
+  (packages->ld.so.conf
+   (list (fhs-union `(,@bolt-launcher-libs
+                      ,@fhs-min-libs)
+                    #:name "fhs-union-64"))))
+
+(define bolt-launcher-ld.so.cache
+  (ld.so.conf->ld.so.cache bolt-launcher-ld.so.conf))
+
+(define-public bolt-launcher-container
+  (nonguix-container
+   (name "bolt-launcher")
+   (wrap-package bolt-launcher-client)
+   (run "/bin/bolt")
+   (ld.so.conf bolt-launcher-ld.so.conf)
+   (ld.so.cache bolt-launcher-ld.so.cache)
+   
+   (union64
+    (fhs-union `(,@bolt-launcher-libs
+                 ,@fhs-min-libs)
+               #:name "fhs-union-64"))
+   (link-files '("share/applications/bolt-launcher.desktop"))
+   (description (package-description bolt-launcher-client))))
+
+(define-public bolt-launcher (nonguix-container->package bolt-launcher-container))
+
+bolt-launcher
