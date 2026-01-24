@@ -2,7 +2,7 @@
 ;; I believe we should actually make a change upstream and change the steam-client
 ;; to be publicly visible or inheritable in some manner... as it would make
 ;; mixing in easier
-(define-module (nongnu packages game-client)
+(define-module (nongnu packages millennium)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module ((nonguix licenses) #:prefix license:)
   #:use-module (guix git-download)
