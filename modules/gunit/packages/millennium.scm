@@ -276,7 +276,7 @@
     (home-page "https://www.openssl.org")
     (license license:asl2.0)))
 
-(define-public steam-millennium
+(define steam-millennium
   (package
     (inherit steam-client)
     (name "steam-millennium")
@@ -371,7 +371,7 @@ exec \"~a\" \"$@\"
 
 (define (steam-container-for driver)
   (nonguix-container
-   (name "steam-container-launcher")
+   (name "steam-m")
    (wrap-package steam-millennium)
    (run "/bin/steam")
    (packages
@@ -399,7 +399,7 @@ all games will be installed.")))
 
 (define-public steam-m (steam-for mesa))
 (define-public steam-m-nvidia
-  (package-with-alias "steam-nvidia" (steam-for nvda)))
+  (package-with-alias "steam-m-nvidia" (steam-for nvda)))
 
 
   steam-m
