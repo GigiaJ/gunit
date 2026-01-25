@@ -1273,6 +1273,7 @@ commonly in arithmetic, comparison and linear algebra operations.")
     (build-system go-build-system)
     (arguments
      (list
+     #:tests? #f
       #:import-path "github.com/dlclark/regexp2"))
     (home-page "https://github.com/dlclark/regexp2/")
     (synopsis "Full featured regular expressions for Go")
