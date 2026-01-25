@@ -1956,3 +1956,29 @@ with the core X protocol and many of the X extensions.")
      "Package tmx implements a parser for the TMX file format used in the Tiled Map
 Editor.")
     (license license:expat)))
+
+(define-public go-github-com-olekukonko-tablewriter
+  (package
+    (name "go-github-com-olekukonko-tablewriter")
+    (version "0.0.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/olekukonko/tablewriter")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zhnrih2px6jm8nxzkz8s7va3lj03bzwxim8wjba9zh7i78bp67z"))))
+    (build-system go-build-system)
+    (arguments
+     (list 
+     #:tests? #f
+     #:import-path "github.com/olekukonko/tablewriter"))
+    (propagated-inputs
+     (list go-github-com-mattn-go-runewidth))
+    (home-page "https://github.com/olekukonko/tablewriter")
+    (synopsis "Generate ASCII tables in Go")
+    (description
+     "Tablewriter is a feature-rich ASCII table generator for the Go programming language.")
+    (license license:expat)))
