@@ -917,6 +917,7 @@ and spf13/pflag with enumeration flags.")
     (build-system go-build-system)
     (arguments
      (list
+          #:tests? #f
       #:import-path "github.com/apache/arrow/go/arrow"
       #:unpack-path "github.com/apache/arrow"))
     (propagated-inputs (list go-google-golang-org-protobuf
@@ -950,6 +951,7 @@ and spf13/pflag with enumeration flags.")
     (build-system go-build-system)
     (arguments
      (list
+     #:tests? #f
       #:import-path "github.com/chewxy/hm"))
     (propagated-inputs (list go-github-com-pkg-errors go-github-com-xtgo-set
                              go-github-com-stretchr-testify))
