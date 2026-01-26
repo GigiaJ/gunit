@@ -1985,9 +1985,9 @@ Editor.")
     (license license:expat)))
 
 
-(define-public go-pdevine-org-tensor
+(define-public go-github-com-pdevine-tensor
   (package
-    (name "go-pdevine-org-tensor")
+    (name "go-github-com-pdevine-tensor")
     (version "0.9.24")
     (source
      (origin
