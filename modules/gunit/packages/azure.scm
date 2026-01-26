@@ -111,7 +111,8 @@
    (run "/bin/az")
    (ld.so.conf azure-cli-ld.so.conf)
    (ld.so.cache azure-cli-ld.so.cache)
-   
+  ;; TODO: This should almost certainly be shared with the actual user home
+  ;; so it creates files in expected locations   
    (union64
     (fhs-union `(,@azure-cli-libs
                  ,@fhs-min-libs)
