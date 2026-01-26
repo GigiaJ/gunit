@@ -84,7 +84,7 @@
   #:use-module (gnu packages python-science)
   #:use-module (gnu packages python-web)
   #:use-module (gunit packages python-xyz)
-  #:use-module ((gnu packages python-xyz) #:hide (python-jupyter-console))
+  #:use-module (gnu packages python-xyz)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages rdf)
   #:use-module (gnu packages readline)
