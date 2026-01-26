@@ -1984,6 +1984,63 @@ Editor.")
      "Tablewriter is a feature-rich ASCII table generator for the Go programming language.")
     (license license:expat)))
 
+(define-public go-github-com-bahlo-generic-list-go
+  (package
+    (name "go-github-com-bahlo-generic-list-go")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/bahlo/generic-list-go")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1nif01xg2y7ihhik65xkx74kszamgvz9ykknj81p71mmdv0fm304"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:import-path "github.com/bahlo/generic-list-go"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/bahlo/generic-list-go")
+    (synopsis "Generic linked list implementation for Go")
+    (description
+     "This package provides a simple, type-safe doubly linked list implementation 
+using Go generics.")
+    (license license:expat)))
+
+(define-public go-github-com-wk8-go-ordered-map-v2
+  (package
+    (name "go-github-com-wk8-go-ordered-map-v2")
+    (version "2.1.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/wk8/go-ordered-map")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0vzl2j6m9pz8ckikf9z2da9zxdbi7fwhcwq8rmzpmf34zl8cjn1g"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/wk8/go-ordered-map/v2"))
+    (native-inputs
+     (list go-github-com-stretchr-testify))
+    (propagated-inputs
+     (list go-github-com-bahlo-generic-list-go
+           go-github-com-buger-jsonparser
+           go-github-com-mailru-easyjson))
+    (home-page "https://github.com/wk8/go-ordered-map")
+    (synopsis "Ordered map in Go with generic support")
+    (description
+     "This package provides an implementation of an ordered map in Go, 
+maintaining the insertion order of elements. It supports generics (available 
+from Go 1.18+) and provides efficient O(1) lookups.")
+    (license license:expat)))
 
 (define-public go-github-com-pdevine-tensor
   (package
@@ -2035,6 +2092,3 @@ Editor.")
 arrays in Go.  Also in this package are functions and methods that are used
 commonly in arithmetic, comparison and linear algebra operations.")
     (license license:asl2.0)))
-
-
-go-github-com-pdevine-tensor
