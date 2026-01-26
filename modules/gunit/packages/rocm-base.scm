@@ -144,45 +144,37 @@
   (make-lld-rocm llvm-rocm lld-18))
 
 ; rocm-device-libs
-(define (make-rocm-device-libs clang-rocm)
+;; --- CHANGE IS HERE: We manually define the 6.2.2 version ---
+(define-public rocm-device-libs-6
   (package
     (name "rocm-device-libs")
-    (version (package-version clang-rocm))
+    (version "6.2.2")  ;; <--- HARDCODED: Stops it from drifting to 7.1.0
     (source
-     (rocm-origin (if (version>=? version "6.1.1") "llvm-project" name)
-                  version))
+     (rocm-origin "llvm-project" version)) ;; Forces download of rocm-6.2.2 tag
     (build-system cmake-build-system)
     (arguments
      (list
       #:build-type "Release"
       #:tests? #f
       #:phases #~(modify-phases %standard-phases
-                   (add-after 'unpack 'ockl_ocml_irif_inc
+                   (add-after 'unpack 'chdir-source
+                     (lambda _ 
+                       ;; Direct path to source for 6.x+
+                       (chdir "amd/device-libs")))
+                   (add-after 'install 'install-headers
                      (lambda* (#:key outputs #:allow-other-keys)
-                       (chdir #$(if (version>=? version "6.1.1")
-                                    "amd/device-libs" "."))
-                       (copy-recursively "irif/inc"
-                                         (string-append (assoc-ref outputs
-                                                                   "out")
-                                                        "/irif/inc"))
-                       (copy-recursively "oclc/inc"
-                                         (string-append (assoc-ref outputs
-                                                                   "out")
-                                                        "/oclc/inc"))
-                       (copy-recursively "ockl/inc"
-                                         (string-append (assoc-ref outputs
-                                                                   "out")
-                                                        "/ockl/inc")))))))
+                       (let ((out (assoc-ref outputs "out")))
+                         (copy-recursively "irif/inc" (string-append out "/irif/inc"))
+                         (copy-recursively "oclc/inc" (string-append out "/oclc/inc"))
+                         (copy-recursively "ockl/inc" (string-append out "/ockl/inc"))))))))
     (native-inputs (list clang-rocm))
-    (synopsis "ROCm Device libraries")
-    (description
-     "This repository contains the sources and CMake build system for 
-a set of AMD specific device-side language runtime libraries.")
-    (home-page "https://github.com/RadeonOpenCompute/ROCm-Device-Libs.git")
+    (synopsis "ROCm Device libraries (Fixed 6.2.2)")
+    (description "AMD specific device-side language runtime libraries.")
+    (home-page "https://github.com/RadeonOpenCompute/ROCm-Device-Libs")
     (license license:ncsa)))
 
-(define-public llvm-device-libs
-  (make-rocm-device-libs clang-rocm))
+;; Allow existing code to find it by the old name if needed
+(define-public llvm-device-libs rocm-device-libs-6)
 
 ; roct-thunk-interface
 (define (make-roct-thunk version)
@@ -438,4 +430,4 @@ CUDA source code into portable HIP C++.")
 
 
 
-rocm-toolchain
+rocm-device-libs-6
