@@ -166,29 +166,19 @@
                 (map (lambda (entry)
                     (let* ((source (car entry)) (file (cdr entry)))
                     (symlink (string-append (assoc-ref %build-inputs source) file)
-                            (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/" (basename file)))))
-                    
-                    
-(append
-  ;; CEF files
-  (map (lambda (file)
-         (cons "chromium-embedded-framework" file))
-       '("/lib/libcef.so"
-         "/share/cef/icudtl.dat"
-         "/share/cef/v8_context_snapshot.bin"))
-
-  ;; Mesa GL/EGL/GLES/Vulkan
-  (map (lambda (file)
-         (cons "mesa" file))
-       '("/lib/libGL.so.1"
-         "/lib/libEGL.so.1"
-         "/lib/libGLESv2.so.2"
-         "/lib/libvulkan.so.1"))
-)
-
-                        
-                    )
-
+                            (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/" (basename file)))))                    
+                (append
+                  (map (lambda (file)
+                        (cons "chromium-embedded-framework" file))
+                      '("/lib/libcef.so"
+                        "/share/cef/icudtl.dat"
+                        "/share/cef/v8_context_snapshot.bin"))
+                  (map (lambda (file)
+                        (cons "mesa" file))
+                      '("/lib/libGL.so.1"
+                        "/lib/libEGL.so.1"
+                        "/lib/libGLESv2.so.2"
+                        "/lib/libvulkan.so.1"))))
                 (wrap-program (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt")
                 `("LD_PRELOAD" ":" prefix (
                     ,(string-append #$(this-package-input "mesa") "/lib/libGL.so.1")
@@ -213,34 +203,30 @@
     (license license:agpl3)))
 
 (define bolt-launcher-libs
-    `(("at-spi2-core" ,at-spi2-core)      ; Required (often) for bolt-launcherVR interface.
-      ("bash" ,bash)                      ; Required for bolt-launcher startup.
+    `(("at-spi2-core" ,at-spi2-core)      
+      ("bash" ,bash)                      
       ("cairo", cairo)
       ("coreutils" ,coreutils)
       ("diffutils" ,diffutils)
-      ("dbus-glib" ,dbus-glib)            ; Required for bolt-launcher browser.
-      ("elfutils" ,elfutils)              ; Required for capturing library dependencies in pv.
-      ("eudev" ,eudev)                    ; Required for bolt-launcherwebhelper/heavy runtime.
-      ("expat" ,expat)                    ; Needed for RS3
-      ("fontconfig" ,fontconfig)          ; Required for bolt-launcher client.
-      ("file" ,file)                      ; Used for bolt-launcher installation.
-      ("find" ,findutils)                 ; Required at least for some logging.
-      ("fmt" ,fmt)                 ; Needed for RS3
-      ("font-google-noto" ,font-google-noto) ; Not required but to match following fonts.
-      ;; These next three fonts are to cover emoji and Chinese/Japanese/Korean
-      ;; and related scripts.
+      ("dbus-glib" ,dbus-glib)            
+      ("elfutils" ,elfutils)              
+      ("eudev" ,eudev)                    
+      ("expat" ,expat)                  
+      ("fontconfig" ,fontconfig)          
+      ("file" ,file)                      
+      ("find" ,findutils)                 
+      ("fmt" ,fmt)               
+      ("font-google-noto" ,font-google-noto) 
       ("font-google-noto-emoji" ,font-google-noto-emoji)
       ("font-google-noto-sans-cjk" ,font-google-noto-sans-cjk)
       ("font-google-noto-serif-cjk" ,font-google-noto-serif-cjk)
-      ("freetype" ,freetype)              ; Required for bolt-launcher login.
-      ("bzip2" ,bzip2)        ; CRITICAL: Cache decompression
-      ("curl" ,curl)          ; CRITICAL: Asset streaming
-      ("libxtst" ,libxtst)    ; CRITICAL: Input handling
-      ("libxscrnsaver" ,libxscrnsaver) ; Recommended: Idle detection
+      ("freetype" ,freetype)              
+      ("bzip2" ,bzip2)        
+      ("curl" ,curl)          
+      ("libxtst" ,libxtst)    
+      ("libxscrnsaver" ,libxscrnsaver) 
       ("gawk" ,gawk)
-      ("gdk-pixbuf" ,gdk-pixbuf)          ; Required for bolt-launcher tray icon.
-      ;; Required for bolt-launcher startup; use newer version for better compatibility
-      ;; with some games like Dwarf Fortress.
+      ("gdk-pixbuf" ,gdk-pixbuf)          
       ("gcc:lib" ,gcc-14 "lib")
       ("glib" ,glib)
       ("glibc" ,glibc)
@@ -248,64 +234,64 @@
       ("gtk+" ,gtk+)
       ("gtk" ,gtk+-2)
       ("libbsd" ,libbsd)
-      ("libcap" ,libcap)                  ; Required for bolt-launcherVR, but needs pkexec too.
-      ("libdrm" ,libdrm)                  ; Needed for RS3
+      ("libcap" ,libcap)   
+      ("libdrm" ,libdrm)                
       ("libglvnd" ,libglvnd)
-      ("libusb" ,libusb)                  ; Required for bolt-launcherVR.
+      ("libusb" ,libusb)                  
       ("libsm" ,libsm)
-      ("libxcb" ,libxcb)                  ; Needed for RS3
-      ("libxcomposite" ,libxcomposite)    ; Needed for RS3
-      ("libxext" ,libxext)    ; Needed for RS3
-      ("libxkbcommon" ,libxkbcommon)    ; Needed for RS3
-      ("libva" ,libva)                    ; Required for hardware video encoding/decoding.
-      ("libvdpau" ,libvdpau)              ; Required for hardware video encoding/decoding.
-      ("libvdpau-va-gl" ,libvdpau-va-gl)  ; Additional VDPAU support.
+      ("libxcb" ,libxcb)                
+      ("libxcomposite" ,libxcomposite)  
+      ("libxext" ,libxext)  
+      ("libxkbcommon" ,libxkbcommon)  
+      ("libva" ,libva)                    
+      ("libvdpau" ,libvdpau)              
+      ("libvdpau-va-gl" ,libvdpau-va-gl)  
       ("libx11" ,libx11)
-      ("libxdamage" ,libxdamage)          ; Needed for RS3
-      ("libxfixes" ,libxfixes)            ; Needed for RS3
+      ("libxdamage" ,libxdamage)        
+      ("libxfixes" ,libxfixes)          
       ("libxxf86vm" ,libxxf86vm)
       ("zstd:lib" ,zstd "lib")
       ("libnsl" ,libnsl)
       ("libpng" ,libpng)
       ("icu4c" ,icu4c)
-      ("llvm" ,llvm-for-mesa)             ; Required for mesa.
-      ("lsof" ,lsof)                      ; Required for some friend's list actions.
-      ("mesa" ,mesa)                      ; Required for bolt-launcher startup.
-      ("nspr" ,nspr)                      ; Required for RS3
-      ("nss-certs" ,nss-certs)            ; Required for bolt-launcher login.
-      ("nss" ,nss)                        ; Needed for RS3
+      ("llvm" ,llvm-for-mesa)             
+      ("lsof" ,lsof)                      
+      ("mesa" ,mesa)                      
+      ("nspr" ,nspr)                      
+      ("nss-certs" ,nss-certs)            
+      ("nss" ,nss)                      
       ("pango" ,pango)
-      ("pciutils" ,pciutils)              ; Tries to run lspci at bolt-launcher startup.
+      ("pciutils" ,pciutils)              
       ("procps" ,procps)
       ("openssl" ,openssl-1.1)
       ("sed" ,sed)
       ("sdl2" ,sdl2)
       ("tar" ,tar)
-      ("usbutils" ,usbutils)              ; Required for bolt-launcherVR.
-      ("util-linux" ,util-linux)          ; Required for bolt-launcher login.
-("vulkan-loader" ,vulkan-loader)   ; <--- ADD THIS
-      ("libxshmfence" ,libxshmfence)     ; <--- ADD THIS
+      ("usbutils" ,usbutils)              
+      ("util-linux" ,util-linux)          
+      ("vulkan-loader" ,vulkan-loader)   
+      ("libxshmfence" ,libxshmfence)     
       ("cups" ,cups)
-      ("wayland" ,wayland)                ; Required for mesa vulkan (e.g. libvulkan_radeon).
-      ("libxcursor" ,libxcursor)            ; Often needed for custom game cursors.
-      ("libxrandr" ,libxrandr)              ; Essential for changing resolutions/fullscreen.
-      ("libxi" ,libxi)                      ; Input extension (gaming mice/tablets).
-      ("xdg-user-dirs" ,xdg-user-dirs)    ; Suppress warning of missing xdg-user-dir.
+      ("wayland" ,wayland)                
+      ("libxcursor" ,libxcursor)            
+      ("libxrandr" ,libxrandr)              
+      ("libxi" ,libxi)                      
+      ("xdg-user-dirs" ,xdg-user-dirs)    
       ("flatpak-xdg-utils" ,flatpak-xdg-utils)
       ("xz" ,xz)
       ("zenity" ,zenity)
       ("zlib" ,zlib)
-      ("alsa-lib" ,alsa-lib)              ; Required for audio in most games.
-      ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio") ; Required for audio in most games.
+      ("alsa-lib" ,alsa-lib)              
+      ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio") 
       ("font-dejavu" ,font-dejavu)
       ("font-liberation" ,font-liberation)
-      ("imgui" ,imgui-1.86)               ; Required for MangoHud.
+      ("imgui" ,imgui-1.86)               
       ("mangohud" ,mangohud)
-      ("openal" ,openal)                  ; Prevents corrupt audio in Crypt of the Necrodancer.
-      ("pulseaudio" ,pulseaudio)          ; Prevents corrupt audio in Sven Coop.
-      ("python" ,python)                  ; Required for KillingFloor2 and Wreckfest.
+      ("openal" ,openal)                  
+      ("pulseaudio" ,pulseaudio)          
+      ("python" ,python)                  
       ("spdlog" ,spdlog)
-    ))                ; Required for progress dialogs.
+    ))                
 
 (define bolt-launcher-ld.so.conf
   (packages->ld.so.conf
@@ -323,7 +309,6 @@
    (run "/bin/bolt")
    (ld.so.conf bolt-launcher-ld.so.conf)
    (ld.so.cache bolt-launcher-ld.so.cache)
-   
    (union64
     (fhs-union `(,@bolt-launcher-libs
                  ,@fhs-min-libs)
@@ -332,5 +317,3 @@
    (description (package-description bolt-launcher-client))))
 
 (define-public bolt-launcher (nonguix-container->package bolt-launcher-container))
-
-bolt-launcher
