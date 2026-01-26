@@ -1999,14 +1999,19 @@ Editor.")
        (sha256
         (base32 "1vxzrlars1ml8n0acc7f2ja8c5d4kbair8ryfm5s29i5i5b7p7z2"))
         (modules '((guix build utils)))
-    
+    (snippet
+        '(begin
+           (use-modules (guix build utils))
+           (substitute* (find-files "." "\\.go$")
+             (("gorgonia.org/tensor") "github.com/pdevine/tensor"))
+           #t))
       ))
     (build-system go-build-system)
     (arguments
      (list
       #:tests? #f
       #:unpack-path "github.com/pdevine/tensor" 
-      #:import-path "gorgonia.org/tensor"
+      #:import-path "github.com/pdevine/tensor" 
     
     ))
     (propagated-inputs (list go-gorgonia-org-vecf64
@@ -2030,3 +2035,6 @@ Editor.")
 arrays in Go.  Also in this package are functions and methods that are used
 commonly in arithmetic, comparison and linear algebra operations.")
     (license license:asl2.0)))
+
+
+go-github-com-pdevine-tensor
