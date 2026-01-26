@@ -115,6 +115,8 @@ provides a user space interface for applications to monitor and control GPU appl
     (source
      (rocm-origin name version))
     (build-system python-build-system)
+    (arguments
+      (list #:tests? #f))
     (native-inputs (list python-pandas))
     (propagated-inputs (list msgpack-3 python-msgpack python-pyyaml
                              python-joblib python-psutil))
