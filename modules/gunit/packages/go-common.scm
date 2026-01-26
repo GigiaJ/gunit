@@ -1,5 +1,6 @@
 ;; From: https://github.com/laura240406/lauras-channel/tree/master
 (define-module (gunit packages go-common)
+  #:use-module (guix)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix gexp)
@@ -1257,7 +1258,7 @@ ordered sets.")
      "Package tensor is a package that provides efficient, generic n-dimensional
 arrays in Go.  Also in this package are functions and methods that are used
 commonly in arithmetic, comparison and linear algebra operations.")
-    (license license:asl2.0)))
+    (license license:asl2.0)))    
 
 (define-public go-github-com-dlclark-regexp2-v1.11.5
   (package
@@ -1982,3 +1983,50 @@ Editor.")
     (description
      "Tablewriter is a feature-rich ASCII table generator for the Go programming language.")
     (license license:expat)))
+
+
+(define-public go-pdevine-org-tensor
+  (package
+    (name "go-pdevine-org-tensor")
+    (version "0.9.24")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/pdevine/tensor")
+             (commit "09d804610a082800eb9c94694dd695071e3e5059")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1vxzrlars1ml8n0acc7f2ja8c5d4kbair8ryfm5s29i5i5b7p7z2"))
+        (modules '((guix build utils)))
+    
+      ))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:unpack-path "github.com/pdevine/tensor" 
+      #:import-path "gorgonia.org/tensor"
+    
+    ))
+    (propagated-inputs (list go-gorgonia-org-vecf64
+                             go-gorgonia-org-vecf32
+                             go-gorgonia-org-tensor
+                             go-gonum-org-v1-gonum
+                             go-gorgonia-org-tensor
+                             go-go4-org-unsafe-assume-no-moving-gc
+                             go-github-com-stretchr-testify
+                             go-github-com-pkg-errors
+                             go-github-com-google-flatbuffers
+                             go-github-com-golang-protobuf
+                             go-github-com-gogo-protobuf
+                             go-github-com-chewxy-math32
+                             go-github-com-chewxy-hm
+                             go-github-com-apache-arrow-go-arrow))
+    (home-page "https://gorgonia.org/tensor")
+    (synopsis "Package")
+    (description
+     "Package tensor is a package that provides efficient, generic n-dimensional
+arrays in Go.  Also in this package are functions and methods that are used
+commonly in arithmetic, comparison and linear algebra operations.")
+    (license license:asl2.0)))
