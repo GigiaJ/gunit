@@ -1,5 +1,6 @@
 (define-module (gunit packages bolt-launcher)
-  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module ((guix licenses)
+                #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -119,201 +120,229 @@
   #:use-module (nongnu packages editors)
   #:use-module (nonguix build-system binary)
   #:use-module (nonguix multiarch-container)
-  #:use-module (nonguix utils)
-)
+  #:use-module (nonguix utils))
 
 (define bolt-launcher-client
-    (package
+  (package
     (name "bolt-launcher")
     (version "0.20.6")
-    (source (origin
-    (method git-fetch)
-    (uri (git-reference
-    (url "https://codeberg.org/Adamcake/Bolt")
-  (commit "542b0d72b90844df909d4c93c0ea75d295ae0c7c")
-  (recursive? #t)))
-  
-        (sha256
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/Adamcake/Bolt")
+             (commit "542b0d72b90844df909d4c93c0ea75d295ae0c7c")
+             (recursive? #t)))
+       (sha256
         (base32 "075dbjsy4nkbsnd1w57l85gpqk9sg2q75gp07xykl5g3j0qgwhcx"))))
     (build-system cmake-build-system)
 
-    (inputs
-        (list 
-        chromium-embedded-framework eudev libarchive glib glibc gtk xdg-utils libxshmfence hicolor-icon-theme nss fmt spng mesa vulkan-loader wayland))
-        (arguments
-        (list
-        #:tests? #f 
-        #:configure-flags
-                #~(list
-                    ;; Can probably clean this up
-                    (string-append "-D " "CMAKE_INSTALL_PREFIX=" (assoc-ref %outputs "out"))
-                    ;;(string-append "-D " "BOLT_DEV_SHOW_DEVTOOLS=" "1")
-                    (string-append "-DBOLT_BINDIR=" "./bin")
-                    (string-append "-DBOLT_SHAREDIR=" "./share")
-                    (string-append "-DBOLT_LIBDIR=" "./lib")
-                    (string-append "-DCEF_DIR=" (assoc-ref %build-inputs "chromium-embedded-framework"))
-                    (string-append "-DCEF_ROOT=" (assoc-ref %build-inputs "chromium-embedded-framework"))
-                    (string-append "-DBOLT_CEF_RESOURCEDIR_OVERRIDE=" (assoc-ref %build-inputs "chromium-embedded-framework") "/share/cef")
-                    (string-append "-DBOLT_LIBCEF_DIRECTORY=" (assoc-ref %build-inputs "chromium-embedded-framework") "/lib")
-                    (string-append "-DBOLT_CEF_INCLUDEPATH=" (assoc-ref %build-inputs "chromium-embedded-framework"))
-                    (string-append "-DBOLT_CEF_DLLWRAPPER=" (assoc-ref %build-inputs "chromium-embedded-framework") "/lib/libcef_dll_wrapper.a")
-                    "-D BOLT_META_NAME=bolt-launcher"
-                    "-D BOLT_SKIP_LIBRARIES=1")
-            #:phases
-            #~(modify-phases %standard-phases
-            (add-after 'install 'link-cef
+    (inputs (list chromium-embedded-framework
+                  eudev
+                  libarchive
+                  glib
+                  glibc
+                  gtk
+                  xdg-utils
+                  libxshmfence
+                  hicolor-icon-theme
+                  nss
+                  fmt
+                  spng
+                  mesa
+                  vulkan-loader
+                  wayland))
+    (arguments
+     (list
+      #:tests? #f
+      #:configure-flags
+      #~(list
+         ;; Can probably clean this up
+         (string-append "-D " "CMAKE_INSTALL_PREFIX="
+                        (assoc-ref %outputs "out"))
+         ;;(string-append "-D " "BOLT_DEV_SHOW_DEVTOOLS=" "1")
+         (string-append "-DBOLT_BINDIR=" "./bin")
+         (string-append "-DBOLT_SHAREDIR=" "./share")
+         (string-append "-DBOLT_LIBDIR=" "./lib")
+         (string-append "-DCEF_DIR="
+                        (assoc-ref %build-inputs "chromium-embedded-framework"))
+         (string-append "-DCEF_ROOT="
+                        (assoc-ref %build-inputs "chromium-embedded-framework"))
+         (string-append "-DBOLT_CEF_RESOURCEDIR_OVERRIDE="
+                        (assoc-ref %build-inputs "chromium-embedded-framework")
+                        "/share/cef")
+         (string-append "-DBOLT_LIBCEF_DIRECTORY="
+                        (assoc-ref %build-inputs "chromium-embedded-framework")
+                        "/lib")
+         (string-append "-DBOLT_CEF_INCLUDEPATH="
+                        (assoc-ref %build-inputs "chromium-embedded-framework"))
+         (string-append "-DBOLT_CEF_DLLWRAPPER="
+                        (assoc-ref %build-inputs "chromium-embedded-framework")
+                        "/lib/libcef_dll_wrapper.a")
+         "-D BOLT_META_NAME=bolt-launcher"
+         "-D BOLT_SKIP_LIBRARIES=1")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'link-cef
             (lambda _
-                (map (lambda (entry)
-                    (let* ((source (car entry)) (file (cdr entry)))
-                    (symlink (string-append (assoc-ref %build-inputs source) file)
-                            (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/" (basename file)))))                    
-                (append
-                  (map (lambda (file)
-                        (cons "chromium-embedded-framework" file))
-                      '("/lib/libcef.so"
-                        "/share/cef/icudtl.dat"
-                        "/share/cef/v8_context_snapshot.bin"))
-                  (map (lambda (file)
-                        (cons "mesa" file))
-                      '("/lib/libGL.so.1"
-                        "/lib/libEGL.so.1"
-                        "/lib/libGLESv2.so.2"
-                        "/lib/libvulkan.so.1"))))
-                (wrap-program (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt")
-                `("LD_PRELOAD" ":" prefix (
-                    ,(string-append #$(this-package-input "mesa") "/lib/libGL.so.1")
-                    ,(string-append #$(this-package-input "mesa") "/lib/libEGL.so.1")
-                    ,(string-append #$(this-package-input "mesa") "/lib/libGLESv2.so.2")
-                    ,(string-append #$(this-package-input "mesa") "/lib/libvulkan.so.1")))
-                `("LD_LIBRARY_PATH" ":" prefix (
-                    ,(string-append #$(this-package-input "mesa") "/lib")
-                    ,(string-append #$(this-package-input "eudev") "/lib")
-                    ,(string-append #$(this-package-input "nss") "/lib/nss")))
-                `("XDG_DATA_DIRS" ":" prefix (
-                    ,(string-append #$(this-package-input "gtk") "/share")))
-                `("PATH" ":" prefix (
-                    ,(string-append #$(this-package-input "xdg-utils") "/bin"))))
-                
-                    (invoke "mv" (string-append (assoc-ref %outputs "out") "/opt/bolt-launcher/bolt") (string-append (assoc-ref %outputs "out") "/bin/bolt"))
-             #t)))))
+              (map (lambda (entry)
+                     (let* ((source (car entry))
+                            (file (cdr entry)))
+                       (symlink (string-append (assoc-ref %build-inputs source)
+                                               file)
+                                (string-append (assoc-ref %outputs "out")
+                                               "/opt/bolt-launcher/"
+                                               (basename file)))))
+                   (append (map (lambda (file)
+                                  (cons "chromium-embedded-framework" file))
+                                '("/lib/libcef.so" "/share/cef/icudtl.dat"
+                                  "/share/cef/v8_context_snapshot.bin"))
+                           (map (lambda (file)
+                                  (cons "mesa" file))
+                                '("/lib/libGL.so.1" "/lib/libEGL.so.1"
+                                  "/lib/libGLESv2.so.2" "/lib/libvulkan.so.1"))))
+              (wrap-program (string-append (assoc-ref %outputs "out")
+                                           "/opt/bolt-launcher/bolt")
+                `("LD_PRELOAD" ":" prefix
+                  (,(string-append #$(this-package-input "mesa")
+                                   "/lib/libGL.so.1") ,(string-append #$(this-package-input
+                                                                         "mesa")
+                                                        "/lib/libEGL.so.1")
+                   ,(string-append #$(this-package-input "mesa")
+                                   "/lib/libGLESv2.so.2")
+                   ,(string-append #$(this-package-input "mesa")
+                                   "/lib/libvulkan.so.1")))
+                `("LD_LIBRARY_PATH" ":" prefix
+                  (,(string-append #$(this-package-input "mesa") "/lib")
+
+                   ,(string-append #$(this-package-input "eudev") "/lib")
+                   ,(string-append #$(this-package-input "nss") "/lib/nss")))
+                `("XDG_DATA_DIRS" ":" prefix
+                  (,(string-append #$(this-package-input "gtk") "/share")))
+                `("PATH" ":" prefix
+                  (,(string-append #$(this-package-input "xdg-utils") "/bin"))))
+
+              (invoke "mv"
+                      (string-append (assoc-ref %outputs "out")
+                                     "/opt/bolt-launcher/bolt")
+                      (string-append (assoc-ref %outputs "out") "/bin/bolt"))
+              #t)))))
     (native-inputs (list cmake git wayland))
-    (synopsis "An alternative third-party open-source launcher for RuneScape or Old School RuneScape.")
+    (synopsis
+     "An alternative third-party open-source launcher for RuneScape or Old School RuneScape.")
     (home-page "https://bolt.adamcake.com/")
-    (description "Free open-source third-party implementation of the Jagex Launcher.")
+    (description
+     "Free open-source third-party implementation of the Jagex Launcher.")
     (license license:agpl3)))
 
 (define bolt-launcher-libs
-    `(("at-spi2-core" ,at-spi2-core)      
-      ("bash" ,bash)                      
-      ("cairo", cairo)
-      ("coreutils" ,coreutils)
-      ("diffutils" ,diffutils)
-      ("dbus-glib" ,dbus-glib)            
-      ("elfutils" ,elfutils)              
-      ("eudev" ,eudev)                    
-      ("expat" ,expat)                  
-      ("fontconfig" ,fontconfig)          
-      ("file" ,file)                      
-      ("find" ,findutils)                 
-      ("fmt" ,fmt)               
-      ("font-google-noto" ,font-google-noto) 
-      ("font-google-noto-emoji" ,font-google-noto-emoji)
-      ("font-google-noto-sans-cjk" ,font-google-noto-sans-cjk)
-      ("font-google-noto-serif-cjk" ,font-google-noto-serif-cjk)
-      ("freetype" ,freetype)              
-      ("bzip2" ,bzip2)        
-      ("curl" ,curl)          
-      ("libxtst" ,libxtst)    
-      ("libxscrnsaver" ,libxscrnsaver) 
-      ("gawk" ,gawk)
-      ("gdk-pixbuf" ,gdk-pixbuf)          
-      ("gcc:lib" ,gcc-14 "lib")
-      ("glib" ,glib)
-      ("glibc" ,glibc)
-      ("grep" ,grep)
-      ("gtk+" ,gtk+)
-      ("gtk" ,gtk+-2)
-      ("libbsd" ,libbsd)
-      ("libcap" ,libcap)   
-      ("libdrm" ,libdrm)                
-      ("libglvnd" ,libglvnd)
-      ("libusb" ,libusb)                  
-      ("libsm" ,libsm)
-      ("libxcb" ,libxcb)                
-      ("libxcomposite" ,libxcomposite)  
-      ("libxext" ,libxext)  
-      ("libxkbcommon" ,libxkbcommon)  
-      ("libva" ,libva)                    
-      ("libvdpau" ,libvdpau)              
-      ("libvdpau-va-gl" ,libvdpau-va-gl)  
-      ("libx11" ,libx11)
-      ("libxdamage" ,libxdamage)        
-      ("libxfixes" ,libxfixes)          
-      ("libxxf86vm" ,libxxf86vm)
-      ("zstd:lib" ,zstd "lib")
-      ("libnsl" ,libnsl)
-      ("libpng" ,libpng)
-      ("icu4c" ,icu4c)
-      ("llvm" ,llvm-for-mesa)             
-      ("lsof" ,lsof)                      
-      ("mesa" ,mesa)                      
-      ("nspr" ,nspr)                      
-      ("nss-certs" ,nss-certs)            
-      ("nss" ,nss)                      
-      ("pango" ,pango)
-      ("pciutils" ,pciutils)              
-      ("procps" ,procps)
-      ("openssl" ,openssl-1.1)
-      ("sed" ,sed)
-      ("sdl2" ,sdl2)
-      ("tar" ,tar)
-      ("usbutils" ,usbutils)              
-      ("util-linux" ,util-linux)          
-      ("vulkan-loader" ,vulkan-loader)   
-      ("libxshmfence" ,libxshmfence)     
-      ("cups" ,cups)
-      ("wayland" ,wayland)                
-      ("libxcursor" ,libxcursor)            
-      ("libxrandr" ,libxrandr)              
-      ("libxi" ,libxi)                      
-      ("xdg-user-dirs" ,xdg-user-dirs)    
-      ("flatpak-xdg-utils" ,flatpak-xdg-utils)
-      ("xz" ,xz)
-      ("zenity" ,zenity)
-      ("zlib" ,zlib)
-      ("alsa-lib" ,alsa-lib)              
-      ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio") 
-      ("font-dejavu" ,font-dejavu)
-      ("font-liberation" ,font-liberation)
-      ("imgui" ,imgui-1.86)               
-      ("mangohud" ,mangohud)
-      ("openal" ,openal)                  
-      ("pulseaudio" ,pulseaudio)          
-      ("python" ,python)                  
-      ("spdlog" ,spdlog)
-    ))                
+  `(("at-spi2-core" ,at-spi2-core)
+    ("bash" ,bash)
+    ("cairo" ,cairo)
+    ("coreutils" ,coreutils)
+    ("diffutils" ,diffutils)
+    ("dbus-glib" ,dbus-glib)
+    ("elfutils" ,elfutils)
+    ("eudev" ,eudev)
+    ("expat" ,expat)
+    ("fontconfig" ,fontconfig)
+    ("file" ,file)
+    ("find" ,findutils)
+    ("fmt" ,fmt)
+    ("font-google-noto" ,font-google-noto)
+    ("font-google-noto-emoji" ,font-google-noto-emoji)
+    ("font-google-noto-sans-cjk" ,font-google-noto-sans-cjk)
+    ("font-google-noto-serif-cjk" ,font-google-noto-serif-cjk)
+    ("freetype" ,freetype)
+    ("bzip2" ,bzip2)
+    ("curl" ,curl)
+    ("libxtst" ,libxtst)
+    ("libxscrnsaver" ,libxscrnsaver)
+    ("gawk" ,gawk)
+    ("gdk-pixbuf" ,gdk-pixbuf)
+    ("gcc:lib" ,gcc-14 "lib")
+    ("glib" ,glib)
+    ("glibc" ,glibc)
+    ("grep" ,grep)
+    ("gtk+" ,gtk+)
+    ("gtk" ,gtk+-2)
+    ("libbsd" ,libbsd)
+    ("libcap" ,libcap)
+    ("libdrm" ,libdrm)
+    ("libglvnd" ,libglvnd)
+    ("libusb" ,libusb)
+    ("libsm" ,libsm)
+    ("libxcb" ,libxcb)
+    ("libxcomposite" ,libxcomposite)
+    ("libxext" ,libxext)
+    ("libxkbcommon" ,libxkbcommon)
+    ("libva" ,libva)
+    ("libvdpau" ,libvdpau)
+    ("libvdpau-va-gl" ,libvdpau-va-gl)
+    ("libx11" ,libx11)
+    ("libxdamage" ,libxdamage)
+    ("libxfixes" ,libxfixes)
+    ("libxxf86vm" ,libxxf86vm)
+    ("zstd:lib" ,zstd "lib")
+    ("libnsl" ,libnsl)
+    ("libpng" ,libpng)
+    ("icu4c" ,icu4c)
+    ("llvm" ,llvm-for-mesa)
+    ("lsof" ,lsof)
+    ("mesa" ,mesa)
+    ("nspr" ,nspr)
+    ("nss-certs" ,nss-certs)
+    ("nss" ,nss)
+    ("pango" ,pango)
+    ("pciutils" ,pciutils)
+    ("procps" ,procps)
+    ("openssl" ,openssl-1.1)
+    ("sed" ,sed)
+    ("sdl2" ,sdl2)
+    ("tar" ,tar)
+    ("usbutils" ,usbutils)
+    ("util-linux" ,util-linux)
+    ("vulkan-loader" ,vulkan-loader)
+    ("libxshmfence" ,libxshmfence)
+    ("cups" ,cups)
+    ("wayland" ,wayland)
+    ("libxcursor" ,libxcursor)
+    ("libxrandr" ,libxrandr)
+    ("libxi" ,libxi)
+    ("xdg-user-dirs" ,xdg-user-dirs)
+    ("flatpak-xdg-utils" ,flatpak-xdg-utils)
+    ("xz" ,xz)
+    ("zenity" ,zenity)
+    ("zlib" ,zlib)
+    ("alsa-lib" ,alsa-lib)
+    ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio")
+    ("font-dejavu" ,font-dejavu)
+    ("font-liberation" ,font-liberation)
+    ("imgui" ,imgui-1.86)
+    ("mangohud" ,mangohud)
+    ("openal" ,openal)
+    ("pulseaudio" ,pulseaudio)
+    ("python" ,python)
+    ("spdlog" ,spdlog)))
 
 (define bolt-launcher-ld.so.conf
-  (packages->ld.so.conf
-   (list (fhs-union `(,@bolt-launcher-libs
-                      ,@fhs-min-libs)
-                    #:name "fhs-union-64"))))
+  (packages->ld.so.conf (list (fhs-union `(,@bolt-launcher-libs ,@fhs-min-libs)
+                                         #:name "fhs-union-64"))))
 
 (define bolt-launcher-ld.so.cache
   (ld.so.conf->ld.so.cache bolt-launcher-ld.so.conf))
 
 (define-public bolt-launcher-container
-  (nonguix-container
-   (name "bolt-launcher")
-   (wrap-package bolt-launcher-client)
-   (run "/bin/bolt")
-   (ld.so.conf bolt-launcher-ld.so.conf)
-   (ld.so.cache bolt-launcher-ld.so.cache)
-   (union64
-    (fhs-union `(,@bolt-launcher-libs
-                 ,@fhs-min-libs)
-               #:name "fhs-union-64"))
-   (link-files '("share/applications/bolt-launcher.desktop"))
-   (description (package-description bolt-launcher-client))))
+  (nonguix-container (name "bolt-launcher")
+                     (wrap-package bolt-launcher-client)
+                     (run "/bin/bolt")
+                     (ld.so.conf bolt-launcher-ld.so.conf)
+                     (ld.so.cache bolt-launcher-ld.so.cache)
+                     (union64 (fhs-union `(,@bolt-launcher-libs ,@fhs-min-libs)
+                                         #:name "fhs-union-64"))
+                     (link-files '("share/applications/bolt-launcher.desktop"))
+                     (description (package-description bolt-launcher-client))))
 
-(define-public bolt-launcher (nonguix-container->package bolt-launcher-container))
+(define-public bolt-launcher
+  (nonguix-container->package bolt-launcher-container))
+
