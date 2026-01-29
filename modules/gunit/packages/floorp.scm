@@ -1,5 +1,6 @@
 (define-module (gunit packages floorp)
-  #:use-module ((nonguix licenses) #:prefix license:)
+  #:use-module ((nonguix licenses)
+                #:prefix license:)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix download)
@@ -57,95 +58,93 @@
   #:use-module (gnu packages xorg)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xml)
-  #:use-module (gnu packages vulkan)
-)
-
+  #:use-module (gnu packages vulkan))
 
 (define-public floorp
   (package
     (name "floorp")
     (version "12.10.2")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://github.com/Floorp-Projects/Floorp/releases/download/v" 
-                                  version "/floorp-linux-x86_64.tar.xz"))
-              (sha256
-               (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/Floorp-Projects/Floorp/releases/download/v"
+             version "/floorp-linux-x86_64.tar.xz"))
+       (sha256
+        (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
     (build-system copy-build-system)
-    (inputs
-     (list 
-     alsa-lib
-           bash-minimal
-           eudev
-           libnotify
-           libva
-           mesa
-           pipewire
-           pulseaudio
-           glibc
-           gtk+
-           libdrm
-           llvm-for-mesa
-           expat
-           zlib
-           zstd
-           elfutils
-           wayland
-           ffmpeg
-           libvpx
-           libwebp
-           xz
-           dav1d
-           libaom
-           lame
-           opus
-           rav1e
-           speex
-           svt-av1
-           libtheora
-           libogg
-           twolame
-           libvorbis
-           libx264
-           x265
-           xvid
-           soxr
-           libvdpau
-           sdl2
-           openal
-           libcaca
-           libass
-           fontconfig
-           freetype
-           bzip2
-           libbluray
-           gnutls
-           pciutils
-           gcc-toolchain
-           pango
-           cairo
-           gdk-pixbuf
-           atk
-           cups
-           libcanberra
-           dbus-glib
-           dbus
-           libx11
-           libxcb
-           libxcomposite
-           libxcursor
-           libxdamage
-           libxext
-           libxfixes
-           libxi
-           libxrandr
-           libxrender
-           libxtst
-           libxxf86vm
-           ))
+    (inputs (list alsa-lib
+                  bash-minimal
+                  eudev
+                  libnotify
+                  libva
+                  mesa
+                  pipewire
+                  pulseaudio
+                  glibc
+                  gtk+
+                  libdrm
+                  llvm-for-mesa
+                  expat
+                  zlib
+                  zstd
+                  elfutils
+                  wayland
+                  ffmpeg
+                  libvpx
+                  libwebp
+                  xz
+                  dav1d
+                  libaom
+                  lame
+                  opus
+                  rav1e
+                  speex
+                  svt-av1
+                  libtheora
+                  libogg
+                  twolame
+                  libvorbis
+                  libx264
+                  x265
+                  xvid
+                  soxr
+                  libvdpau
+                  sdl2
+                  openal
+                  libcaca
+                  libass
+                  fontconfig
+                  freetype
+                  bzip2
+                  libbluray
+                  gnutls
+                  pciutils
+                  gcc-toolchain
+                  pango
+                  cairo
+                  gdk-pixbuf
+                  atk
+                  cups
+                  libcanberra
+                  dbus-glib
+                  dbus
+                  libx11
+                  libxcb
+                  libxcomposite
+                  libxcursor
+                  libxdamage
+                  libxext
+                  libxfixes
+                  libxi
+                  libxrandr
+                  libxrender
+                  libxtst
+                  libxxf86vm))
     (arguments
      (list
-      #:install-plan #~'(("." "lib/floorp"))
+      #:install-plan
+      #~'(("." "lib/floorp"))
       #:phases
       #~(modify-phases %standard-phases
           (delete 'validate-runpath)
@@ -156,9 +155,10 @@
                      (interpreter (string-append (assoc-ref inputs "glibc")
                                                  "/lib/ld-linux-x86-64.so.2")))
                 (for-each (lambda (binary)
-                            (invoke "patchelf" "--set-interpreter" interpreter binary))
-                          (find-files lib "^(floorp|glxtest|vaapitest|plugin-container|minidump-analyzer|updater|pingsender)$")))))
-
+                            (invoke "patchelf" "--set-interpreter" interpreter
+                                    binary))
+                          (find-files lib
+                           "^(floorp|glxtest|vaapitest|plugin-container|minidump-analyzer|updater|pingsender)$")))))
           (add-after 'patch-interpreters 'wrap-binary
             (lambda* (#:key inputs outputs #:allow-other-keys)
               (let* ((out (assoc-ref outputs "out"))
@@ -166,27 +166,62 @@
                      (lib (string-append out "/lib/floorp"))
                      ;; FIX: Map EVERY input to the LD_LIBRARY_PATH
                      (libs (map (lambda (input)
-                                  (string-append (assoc-ref inputs input) "/lib"))
-                                '("alsa-lib" "libva" "mesa" "pipewire" "pulseaudio" "glibc"
-                                  "gtk+" "libdrm" "pciutils" "ffmpeg" "wayland" 
-                                  "gcc-toolchain" "eudev" "glib" "dbus" "dbus-glib"
-                                  "pango" "cairo" "gdk-pixbuf" "atk" "cups" "libcanberra"
-                                  "libx11" "libxcb" "libxcomposite" "libxcursor" "libxdamage" 
-                                  "libxext" "libxfixes" "libxi" "libxrandr" "libxrender" 
-                                  "libxtst" "libxxf86vm"))) 
-                     (mesa-dri (string-append (assoc-ref inputs "mesa") "/lib/dri")))
-                (mkdir-p bin)                
+                                  (string-append (assoc-ref inputs input)
+                                                 "/lib"))
+                                '("alsa-lib" "libva"
+                                  "mesa"
+                                  "pipewire"
+                                  "pulseaudio"
+                                  "glibc"
+                                  "gtk+"
+                                  "libdrm"
+                                  "pciutils"
+                                  "ffmpeg"
+                                  "wayland"
+                                  "gcc-toolchain"
+                                  "eudev"
+                                  "glib"
+                                  "dbus"
+                                  "dbus-glib"
+                                  "pango"
+                                  "cairo"
+                                  "gdk-pixbuf"
+                                  "atk"
+                                  "cups"
+                                  "libcanberra"
+                                  "libx11"
+                                  "libxcb"
+                                  "libxcomposite"
+                                  "libxcursor"
+                                  "libxdamage"
+                                  "libxext"
+                                  "libxfixes"
+                                  "libxi"
+                                  "libxrandr"
+                                  "libxrender"
+                                  "libxtst"
+                                  "libxxf86vm")))
+                     (mesa-dri (string-append (assoc-ref inputs "mesa")
+                                              "/lib/dri")))
+                (mkdir-p bin)
                 (wrap-program (string-append lib "/floorp")
-                  `("LD_LIBRARY_PATH" prefix ,libs)
-                  `("LIBVA_DRIVERS_PATH" = (,mesa-dri))
-                  `("MOZ_ENABLE_WAYLAND" = ("1"))
-                  `("MOZ_DISABLE_RDD_SANDBOX" = ("1")))
+                  `("LD_LIBRARY_PATH" prefix
+                    ,libs)
+                  `("LIBVA_DRIVERS_PATH" =
+                    (,mesa-dri))
+                  `("MOZ_ENABLE_WAYLAND" =
+                    ("1"))
+                  `("MOZ_DISABLE_RDD_SANDBOX" =
+                    ("1")))
                 (symlink (string-append lib "/floorp")
                          (string-append bin "/floorp"))))))))
-
     (native-inputs (list git patchelf))
     (synopsis "A highly customizable Firefox-based (Gecko) browser")
     (home-page "https://floorp.app/")
-    (description "Floorp is the first Firefox-based browser to enable UI customization.")
-        (license (license:nonfree "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE"))))
-    floorp
+    (description
+     "Floorp is the first Firefox-based browser to enable UI customization.")
+    (license (license:nonfree
+              "https://github.com/Floorp-Projects/Floorp-private-components/blob/main/LICENSE"))))
+
+floorp
+
