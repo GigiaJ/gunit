@@ -15,32 +15,30 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (gunit packages rocm-hip)
-  #:use-module (guix gexp)
-  #:use-module (guix utils)
-  #:use-module (guix packages)
-  #:use-module (guix build-system cmake)
-  #:use-module (guix build-system copy)
-  #:use-module (guix git-download)
-  #:use-module (guix licenses)
 
-  #:use-module (gnu packages)
+(define-module (gunit packages rocm-hip)
+  #:use-module (amd packages rocm-origin)
   #:use-module (gnu packages base)
-  #:use-module (gnu packages perl)
-  #:use-module (gnu packages llvm)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages gl)
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages llvm)
+  #:use-module (gnu packages perl)
   #:use-module (gnu packages python)
-  #:use-module (gnu packages gl)
   #:use-module (gnu packages version-control)
-
-  #:use-module (amd packages rocm-origin)
+  #:use-module (gnu packages)
+  #:use-module (guix build-system cmake)
+  #:use-module (guix build-system copy)
+  #:use-module (guix gexp)
+  #:use-module (guix git-download)
+  #:use-module (guix licenses)
+  #:use-module (guix packages)
+  #:use-module (guix utils)
   #:use-module (gunit packages python-cppheaderparser)
-  #:use-module (gunit packages rocm-tools)
-  #:use-module (gunit packages rocm-base))
+  #:use-module (gunit packages rocm-base)
+  #:use-module (gunit packages rocm-tools))
 
-; rocm-comgr
 (define (make-rocm-comgr rocm-device-libs llvm-rocm lld-rocm clang-rocm)
   (package
     (name "rocm-comgr")
@@ -52,21 +50,21 @@
     (arguments
      (list
       #:tests? #f
-      #:phases #~(modify-phases %standard-phases
-                   (add-after 'unpack 'chdir
-                     (lambda _
-                       (setenv "HIP_DEVICE_LIB_PATH"
-                               (string-append #$(this-package-input
-                                                 "rocm-device-libs")
-                                              "/amdgcn/bitcode"))
-                       (chdir #$(if (version>=? version "6.1.1") "amd/comgr"
-                                    "lib/comgr"))))
-                   (add-before 'configure 'fix-path
-                     (lambda _
-                       (substitute* "src/comgr-env.cpp"
-                         (("getDetector\\(\\)->getLLVMPath\\(\\)")
-                          (string-append "\""
-                                         #$clang-rocm "\""))))))))
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'chdir
+            (lambda _
+              (setenv "HIP_DEVICE_LIB_PATH"
+                      (string-append #$(this-package-input "rocm-device-libs")
+                                     "/amdgcn/bitcode"))
+              (chdir #$(if (version>=? version "6.1.1") "amd/comgr"
+                           "lib/comgr"))))
+          (add-before 'configure 'fix-path
+            (lambda _
+              (substitute* "src/comgr-env.cpp"
+                (("getDetector\\(\\)->getLLVMPath\\(\\)")
+                 (string-append "\""
+                                #$clang-rocm "\""))))))))
     (inputs (list rocm-device-libs))
     (native-inputs (list llvm-rocm lld-rocm clang-rocm))
     (synopsis "The ROCm Code Object Manager")
@@ -88,7 +86,8 @@
                     (build-system copy-build-system)
                     (arguments
                      (list
-                      #:install-plan #~`(("." "/"))))
+                      #:install-plan
+                      #~`(("." "/"))))
                     (synopsis
                      "The Heterogeneous Interface for Portability (HIP) framework")
                     (description
@@ -101,7 +100,6 @@ for AMD and NVIDIA GPUs from single source code.")
 (define-public hip
   (make-hip rocm-version-latest))
 
-; hipcc
 (define (make-hipcc rocminfo rocm-toolchain)
   (hidden-package (package
                     (name "hipcc")
@@ -114,13 +112,70 @@ for AMD and NVIDIA GPUs from single source code.")
                      (list
                       #:build-type "Release"
                       #:tests? #f
-                      #:phases #~(modify-phases %standard-phases
-                                   (add-after 'unpack 'chdir
-                                     (lambda _
-                                       (chdir #$(if (version>=? version
-                                                                "6.1.1")
-                                                    "amd/hipcc" ".")))))))
-                    (propagated-inputs (list rocminfo rocm-toolchain))
+                      #:phases
+                      #~(modify-phases %standard-phases
+                          (add-after 'unpack 'chdir
+                            (lambda _
+                              (chdir #$(if (version>=? version "6.1.1")
+                                           "amd/hipcc" "."))))
+                          (add-after 'install 'patch-perl
+                            (lambda* (#:key inputs outputs #:allow-other-keys)
+                              (let* ((out (assoc-ref outputs "out"))
+                                     (rinfo (assoc-ref inputs "rocminfo"))
+                                     (perl (assoc-ref inputs "perl"))
+                                     (rocm (assoc-ref inputs "rocm-toolchain"))
+                                     (device-libs (assoc-ref inputs
+                                                   "rocm-device-libs"))
+                                     (files '("hipcc.pl" "hipconfig.pl"
+                                              "hipvars.pm" "hipcc" "hipconfig")))
+                                (for-each (lambda (f)
+                                            (substitute* (string-append out
+                                                          "/bin/" f)
+                                              (("\\$HIP_PATH *= *\\$ENV\\{'HIP_PATH'\\} *// *dirname\\(Cwd::abs_path\\(\"\\$0/\\.\\./\"\\)\\);")
+                                               (string-append "$HIP_PATH = \""
+                                                              out "\";")))
+                                            (substitute* (string-append out
+                                                          "/bin/hipcc.pl")
+                                              (("\\$ROCMINFO_PATH[[:space:]]*=[[:space:]]*\\$hipvars::ROCMINFO_PATH;")
+                                               (string-append
+                                                "$ROCMINFO_PATH = \"" rinfo
+                                                "\";")))
+                                            (substitute* (string-append out
+                                                          "/bin/hipcc.pl")
+                                              (("\\DEVICE_LIB_PATH[[:space:]]*=[[:space:]]*\\$hipvars::DEVICE_LIB_PATH;")
+                                               (string-append
+                                                "DEVICE_LIB_PATH = \""
+                                                device-libs "\";")))
+
+                                            (substitute* (string-append out
+                                                          "/bin/" f)
+                                              (("^#!/usr/bin/env perl$")
+                                               (string-append "#!" perl
+                                                              "/bin/perl\n")))
+                                            (substitute* (string-append out
+                                                          "/bin/" f)
+                                              (("/opt/rocm")
+                                               (string-append out)))) files))))
+                          (add-after 'patch-perl 'wrap-hipcc
+                            (lambda* (#:key outputs inputs #:allow-other-keys)
+                              (let* ((out (assoc-ref outputs "out"))
+                                     (rt (assoc-ref inputs "rocm-toolchain"))
+                                     (rinfo (assoc-ref inputs "rocminfo")))
+                                (wrap-program (string-append out "/bin/hipcc")
+                                  `("ROCMINFO_PATH" =
+                                    (,(string-append rinfo)))
+                                  `("ROCM_PATH" =
+                                    (,(string-append rt)))
+                                  `("HIP_CLANG_PATH" =
+                                    (,(string-append rt "/bin")))
+                                  `("DEVICE_LIB_PATH" =
+                                    (,(string-append rt "/amdgcn/bitcode")))
+                                  `("PATH" ":" prefix
+                                    (,(string-append rt "/bin") ,(string-append
+                                                                  rinfo "/bin"))))))))))
+                    (propagated-inputs (list rocminfo rocm-toolchain
+                                             rocm-device-libs))
+                    (native-inputs (list perl))
                     (synopsis "HIP compiler driver (hipcc)")
                     (description
                      "The HIP compiler driver (hipcc) is a compiler utility that will call
@@ -131,7 +186,6 @@ clang and pass the appropriate include and library options for the target compil
 (define-public hipcc
   (make-hipcc rocminfo rocm-toolchain))
 
-; clr "hipamd" versions >= 5.6
 (define (make-clr-hipamd hip hipcc rocm-comgr)
   (package
     (name "hipamd")
@@ -143,63 +197,63 @@ clang and pass the appropriate include and library options for the target compil
      (list
       #:build-type "Release"
       #:tests? #f
-      #:configure-flags #~(list (string-append "-DHIP_COMMON_DIR="
-                                               #$hip)
-                                (string-append "-DHIPCC_BIN_DIR="
-                                               #$hipcc "/bin")
-                                "-DCLR_BUILD_HIP=ON"
-                                "-DCLR_BUILD_OCL=OFF"
-                                "-DHIP_ENABLE_ROCPROFILER_REGISTER=OFF"
-                                "-D__HIP_ENABLE_PCH=OFF"
-                                "-DHIP_PLATFORM=amd")
-      #:phases #~(modify-phases %standard-phases
-                   (add-after 'install 'info-version'
-                     (lambda _
-                       (mkdir (string-append #$output "/.info"))
-                       (with-output-to-file (string-append #$output
-                                                           "/.info/version")
-                         (lambda ()
-                           (display (string-append #$version "-0"))))))
-                   (add-after 'install 'overwrite-hipvars
-                     (lambda* (#:key outputs inputs #:allow-other-keys)
-                       (with-output-to-file (string-append (assoc-ref outputs
-                                                                      "out")
-                                                           "/bin/hipvars.pm")
-                         (lambda ()
-                           (display (string-append "package hipvars;\n"
-                                     "$isWindows = 0;\n"
-                                     "$doubleQuote = \"\\\"\";\n"
-                                     "$CUDA_PATH = \"\";\n"
-                                     "$HIP_PLATFORM = \"amd\";\n"
-                                     "$HIP_COMPILER = \"clang\";\n"
-                                     "$HIP_RUNTIME = \"rocclr\";\n"
-                                     "$HIP_CLANG_RUNTIME = \""
-                                     (assoc-ref inputs "rocm-toolchain")
-                                     "\";\n"
-                                     "$DEVICE_LIB_PATH = \""
-                                     (assoc-ref inputs "rocm-toolchain")
-                                     "/amdgcn/bitcode\";\n"
-                                     "$HIP_CLANG_PATH = \""
-                                     (assoc-ref inputs "rocm-toolchain")
-                                     "/bin\";\n"
-                                     "$HIP_PATH = \""
-                                     #$output
-                                     "\";\n"
-                                     "$HIP_VERSION= \""
-                                     #$version
-                                     "\";\n"
-                                     "$ROCMINFO_PATH = \""
-                                     (assoc-ref inputs "rocminfo")
-                                     "\";\n"
-                                     "$ROCR_RUNTIME_PATH = \""
-                                     (assoc-ref inputs "rocm-toolchain")
-                                     "\";\n"
-                                     "$HIP_INFO_PATH = \"$HIP_PATH/lib/.hipInfo\";
+      #:configure-flags
+      #~(list (string-append "-DHIP_COMMON_DIR="
+                             #$hip)
+              (string-append "-DHIPCC_BIN_DIR="
+                             #$hipcc "/bin")
+              "-DCLR_BUILD_HIP=ON"
+              "-DCLR_BUILD_OCL=OFF"
+              "-DHIP_ENABLE_ROCPROFILER_REGISTER=OFF"
+              "-D__HIP_ENABLE_PCH=OFF"
+              "-DHIP_PLATFORM=amd")
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'install 'info-version'
+            (lambda _
+              (mkdir (string-append #$output "/.info"))
+              (with-output-to-file (string-append #$output "/.info/version")
+                (lambda ()
+                  (display (string-append #$version "-0"))))))
+          (add-after 'install 'overwrite-hipvars
+            (lambda* (#:key outputs inputs #:allow-other-keys)
+              (with-output-to-file (string-append (assoc-ref outputs "out")
+                                                  "/bin/hipvars.pm")
+                (lambda ()
+                  (display (string-append "package hipvars;\n"
+                            "$isWindows = 0;\n"
+                            "$doubleQuote = \"\\\"\";\n"
+                            "$CUDA_PATH = \"\";\n"
+                            "$HIP_PLATFORM = \"amd\";\n"
+                            "$HIP_COMPILER = \"clang\";\n"
+                            "$HIP_RUNTIME = \"rocclr\";\n"
+                            "$HIP_CLANG_RUNTIME = \""
+                            (assoc-ref inputs "rocm-toolchain")
+                            "\";\n"
+                            "$DEVICE_LIB_PATH = \""
+                            (assoc-ref inputs "rocm-toolchain")
+                            "/amdgcn/bitcode\";\n"
+                            "$HIP_CLANG_PATH = \""
+                            (assoc-ref inputs "rocm-toolchain")
+                            "/bin\";\n"
+                            "$HIP_PATH = \""
+                            #$output
+                            "\";\n"
+                            "$HIP_VERSION= \""
+                            #$version
+                            "\";\n"
+                            "$ROCMINFO_PATH = \""
+                            (assoc-ref inputs "rocminfo")
+                            "\";\n"
+                            "$ROCR_RUNTIME_PATH = \""
+                            (assoc-ref inputs "rocm-toolchain")
+                            "\";\n"
+                            "$HIP_INFO_PATH = \"$HIP_PATH/lib/.hipInfo\";
 "
-                                     "$HIP_ROCCLR_HOME = $HIP_PATH;\n"
-                                     "$ROCM_PATH = \""
-                                     (assoc-ref inputs "rocm-toolchain")
-                                     "\";")))))))))
+                            "$HIP_ROCCLR_HOME = $HIP_PATH;\n"
+                            "$ROCM_PATH = \""
+                            (assoc-ref inputs "rocm-toolchain")
+                            "\";")))))))))
     (native-inputs (list mesa
                          libffi
                          git
@@ -245,5 +299,3 @@ it is required for building some of the libraries that are a part of ROCm.")
 (define-public rocm-cmake
   (make-rocm-cmake rocm-version-latest))
 
-
-  hipamd
