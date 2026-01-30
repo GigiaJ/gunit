@@ -1,10 +1,8 @@
-;; Bit from https://github.com/laura240406/lauras-channel/blob/master/laura/packages/ai.scm#
-;; I just didn't feel like adding another channel... I'd encourage them to upstream at some point.
-
 (define-module (gunit packages ai)
   #:use-module (guix)
   #:use-module ((guix licenses)
                 #:prefix license:)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages)
   #:use-module (guix build-system go)
   #:use-module (guix git-download)
@@ -15,37 +13,79 @@
   #:use-module (gnu packages golang-check)
   #:use-module (gnu packages golang-web)
   #:use-module (gnu packages cmake)
+  #:use-module (gnu packages python-xyz)
+  #:use-module (gnu packages perl)
+  #:use-module (guix-science-nonfree packages cuda)
+  #:use-module (nongnu packages nvidia)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages vulkan)
+  #:use-module (guix build-system cmake)
+  #:use-module (gunit packages rocm-base)
+  #:use-module (gunit packages rocm-tools)
+  #:use-module (gunit packages rocm-libs)
+  #:use-module (gnu packages llvm)
+  #:use-module (gunit packages rocm-hip)
   #:use-module (gunit packages go-common))
 
-(define-public ollama
+(define-public ollama-bin
   (package
-    (name "ollama")
-    (version "0.9.1")
+    (name "ollama-bin")
+    (version "0.13.2")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://github.com/ollama/ollama")
-             (commit "v0.9.1")))
-       (file-name (git-file-name name version))
+             (commit (string-append "v" version))))
+       (file-name (git-file-name "ollama" version))
        (modules '((guix build utils)))
-       (snippet #~(map (lambda x
-                         (substitute* x
-                           (("github.com/pdevine/tensor")
-                            "gorgonia.org/tensor")))
-                       (list "convert/convert_llama4.go"
-                             "convert/convert_mistral.go"
-                             "convert/convert_mllama.go"
-                             "convert/convert_gemma.go"
-                             "convert/convert_gemma2_adapter.go"
-                             "convert/convert_llama.go"
-                             "convert/convert_llama_adapter.go"
-                             "convert/tensor.go"
-                             "convert/tensor_test.go"
-                             "go.mod"
-                             "go.sum")))
+       (snippet #~(begin
+                    (for-each (lambda (file)
+                                (substitute* file
+                                  (("github.com/pdevine/tensor")
+                                   "gorgonia.org/tensor")))
+                              (append (find-files "convert" "\\.go$")
+                                      (list "go.mod" "go.sum")))))
        (sha256
-        (base32 "1h9gan8l70ilsnzjlw2wjsd1bh558fb3xbg06zpbz3b5cilbq5pa"))))
+        (base32 "0vy8mwfxfxszayi7c5jbmz0wisvp77q1pgv8v0lfmz2bfw4jzykx"))))
+    (build-system cmake-build-system)
+    (arguments
+     (list
+      #:build-type "Release"
+      #:tests? #f
+      #:configure-flags
+      #~(list (string-append "-DCMAKE_CXX_COMPILER="
+                             #$hipamd "/bin/hipcc")
+              (string-append "-DCMAKE_C_COMPILER="
+                             #$hipamd "/bin/hipcc")
+              (string-append "-DCMAKE_PREFIX_PATH="
+                             #$hipblas ";"
+                             #$rocblas)
+              "-DGGML_HIPBLAS=ON"
+              "-DGGML_HIP=ON"
+              "-DCLR_BUILD_HIP=ON"
+              "-DCLR_BUILD_OCL=OFF"
+              "-DHIP_ENABLE_ROCPROFILER_REGISTER=OFF"
+              "-D__HIP_ENABLE_PCH=OFF"
+              "-DHIP_PLATFORM=amd")
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'check)
+          (delete 'validate-runpath))))
+    (native-inputs (list cmake pkg-config hipcc perl bash))
+    (propagated-inputs (list perl))
+    (inputs (list hipamd rocblas hipblas))
+    (home-page "https://ollama.com")
+    (synopsis "Ollama C++ backend")
+    (description "C++ backend libraries for Ollama.")
+    (license license:expat)))
+
+(define-public ollama
+  (package
+    (name "ollama")
+    (version "0.13.2")
+    (source
+     (package-source ollama-bin))
     (build-system go-build-system)
     (arguments
      (list
@@ -56,18 +96,39 @@
       #~(modify-phases %standard-phases
           (delete 'check)
           (delete 'validate-runpath)
-          (add-after 'install 'accelerators
-            (lambda _
-              (begin
-                (chdir "src/github.com/ollama/ollama")
-                (system "cmake .")
-                (system (string-append "make -j"
-                                       (number->string (parallel-job-count))))
-                (system (string-append "cp -r lib "
-                                       #$output))
-                (chdir "../../../..")))))))
-    (native-inputs (list cmake))
-    (inputs (list go-std-1.23
+          (add-after 'install 'install-backend
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (backend (assoc-ref inputs "ollama-bin"))
+                     (runners-dst (string-append out "/lib/ollama")))
+                (mkdir-p runners-dst)
+
+                (copy-recursively (string-append backend "/lib")
+                                  (string-append runners-dst))
+
+                (wrap-program (string-append out "/bin/ollama")
+                  `("LD_LIBRARY_PATH" prefix
+                    (,(string-append backend "/lib") ,(string-append (assoc-ref
+                                                                      inputs
+                                                                      "hipamd")
+                                                                     "/lib")
+                     ,(string-append (assoc-ref inputs "hipblas") "/lib")
+                     ,(string-append (assoc-ref inputs "rocblas") "/lib")
+                     ,(string-append (assoc-ref inputs "rocblas")
+                                     "/lib/rocblas")
+                     ,(string-append (assoc-ref inputs "rocm-toolchain")
+                                     "/lib")))
+                  `("HSA_OVERRIDE_GFX_VERSION" =
+                    ("10.3.0")))))))))
+
+    (native-inputs (list pkg-config))
+    (inputs (list ollama-bin
+                  hipamd
+                  hipblas
+                  rocblas
+                  rocm-toolchain
+
+                  go-std-1.23
                   go-google-golang-org-protobuf
                   go-golang-org-x-text
                   go-golang-org-x-term
@@ -95,6 +156,6 @@
                   go-github-com-containerd-console))
     (home-page "https://ollama.com")
     (synopsis "Get up and running with large language models.")
-    (description
-     "Get up and running with Llama 3.3, DeepSeek-R1, Phi-4, Gemma 3, and other large language models.")
+    (description "Run LLMs locally.")
     (license license:expat)))
+
