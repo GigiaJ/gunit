@@ -117,62 +117,7 @@ for AMD and NVIDIA GPUs from single source code.")
                           (add-after 'unpack 'chdir
                             (lambda _
                               (chdir #$(if (version>=? version "6.1.1")
-                                           "amd/hipcc" "."))))
-                          (add-after 'install 'patch-perl
-                            (lambda* (#:key inputs outputs #:allow-other-keys)
-                              (let* ((out (assoc-ref outputs "out"))
-                                     (rinfo (assoc-ref inputs "rocminfo"))
-                                     (perl (assoc-ref inputs "perl"))
-                                     (rocm (assoc-ref inputs "rocm-toolchain"))
-                                     (device-libs (assoc-ref inputs
-                                                   "rocm-device-libs"))
-                                     (files '("hipcc.pl" "hipconfig.pl"
-                                              "hipvars.pm" "hipcc" "hipconfig")))
-                                (for-each (lambda (f)
-                                            (substitute* (string-append out
-                                                          "/bin/" f)
-                                              (("\\$HIP_PATH *= *\\$ENV\\{'HIP_PATH'\\} *// *dirname\\(Cwd::abs_path\\(\"\\$0/\\.\\./\"\\)\\);")
-                                               (string-append "$HIP_PATH = \""
-                                                              out "\";")))
-                                            (substitute* (string-append out
-                                                          "/bin/hipcc.pl")
-                                              (("\\$ROCMINFO_PATH[[:space:]]*=[[:space:]]*\\$hipvars::ROCMINFO_PATH;")
-                                               (string-append
-                                                "$ROCMINFO_PATH = \"" rinfo
-                                                "\";")))
-                                            (substitute* (string-append out
-                                                          "/bin/hipcc.pl")
-                                              (("\\DEVICE_LIB_PATH[[:space:]]*=[[:space:]]*\\$hipvars::DEVICE_LIB_PATH;")
-                                               (string-append
-                                                "DEVICE_LIB_PATH = \""
-                                                device-libs "\";")))
-
-                                            (substitute* (string-append out
-                                                          "/bin/" f)
-                                              (("^#!/usr/bin/env perl$")
-                                               (string-append "#!" perl
-                                                              "/bin/perl\n")))
-                                            (substitute* (string-append out
-                                                          "/bin/" f)
-                                              (("/opt/rocm")
-                                               (string-append out)))) files))))
-                          (add-after 'patch-perl 'wrap-hipcc
-                            (lambda* (#:key outputs inputs #:allow-other-keys)
-                              (let* ((out (assoc-ref outputs "out"))
-                                     (rt (assoc-ref inputs "rocm-toolchain"))
-                                     (rinfo (assoc-ref inputs "rocminfo")))
-                                (wrap-program (string-append out "/bin/hipcc")
-                                  `("ROCMINFO_PATH" =
-                                    (,(string-append rinfo)))
-                                  `("ROCM_PATH" =
-                                    (,(string-append rt)))
-                                  `("HIP_CLANG_PATH" =
-                                    (,(string-append rt "/bin")))
-                                  `("DEVICE_LIB_PATH" =
-                                    (,(string-append rt "/amdgcn/bitcode")))
-                                  `("PATH" ":" prefix
-                                    (,(string-append rt "/bin") ,(string-append
-                                                                  rinfo "/bin"))))))))))
+                                           "amd/hipcc" ".")))))))
                     (propagated-inputs (list rocminfo rocm-toolchain
                                              rocm-device-libs))
                     (native-inputs (list perl))
