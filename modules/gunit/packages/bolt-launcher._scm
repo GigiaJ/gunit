@@ -122,6 +122,22 @@
   #:use-module (nonguix multiarch-container)
   #:use-module (nonguix utils))
 
+(define-public chromium-embedded-framework-130
+  (package
+    (inherit chromium-embedded-framework)
+    (version "130.1.9+g39d0473+chromium-130.0.6723.70")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://cef-builds.spotifycdn.com/cef_binary_"
+                           "130.1.9%2Bg39d0473%2Bchromium-130.0.6723.70"
+                           "_linux64.tar.bz2"))
+
+       (file-name "chromium-embedded-framework-115")
+       (sha256
+        (base32 "0f6m6n5n7y5w2m3p9k8j8k9x8l7z6r5q4p3n2m1l0k9j8h7g6f5d")))))); dummy hash
+
+
 (define bolt-launcher-client
   (package
     (name "bolt-launcher")
@@ -134,10 +150,10 @@
              (commit "542b0d72b90844df909d4c93c0ea75d295ae0c7c")
              (recursive? #t)))
        (sha256
-        (base32 "075dbjsy4nkbsnd1w57l85gpqk9sg2q75gp07xykl5g3j0qgwhcx"))))
+        (base32 "0jirsr3i2lwq4qz66gc0ykk3fqp0hm5x63qwh9xgwzay5i84l0j1"))))
     (build-system cmake-build-system)
 
-    (inputs (list chromium-embedded-framework
+    (inputs (list chromium-embedded-framework-130
                   eudev
                   libarchive
                   glib
@@ -227,7 +243,7 @@
                                      "/opt/bolt-launcher/bolt")
                       (string-append (assoc-ref %outputs "out") "/bin/bolt"))
               #t)))))
-    (native-inputs (list cmake git wayland))
+    (native-inputs (list cmake pkg-config git wayland))
     (synopsis
      "An alternative third-party open-source launcher for RuneScape or Old School RuneScape.")
     (home-page "https://bolt.adamcake.com/")
@@ -346,3 +362,4 @@
 (define-public bolt-launcher
   (nonguix-container->package bolt-launcher-container))
 
+bolt-launcher
