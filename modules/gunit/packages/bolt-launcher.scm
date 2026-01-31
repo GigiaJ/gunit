@@ -116,44 +116,28 @@
   #:use-module (guix build utils)
   #:use-module (guix build gnu-build-system)
   #:use-module (guix base16)
-  #:use-module (nongnu packages chromium)
+  #:use-module (gunit packages chromium)
   #:use-module (nongnu packages editors)
   #:use-module (nonguix build-system binary)
   #:use-module (nonguix multiarch-container)
   #:use-module (nonguix utils))
 
-(define-public chromium-embedded-framework-130
-  (package
-    (inherit chromium-embedded-framework)
-    (version "130.1.9+g39d0473+chromium-130.0.6723.70")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://cef-builds.spotifycdn.com/cef_binary_"
-                           "130.1.9%2Bg39d0473%2Bchromium-130.0.6723.70"
-                           "_linux64.tar.bz2"))
-
-       (file-name "chromium-embedded-framework-115")
-       (sha256
-        (base32 "0f6m6n5n7y5w2m3p9k8j8k9x8l7z6r5q4p3n2m1l0k9j8h7g6f5d")))))); dummy hash
-
-
 (define bolt-launcher-client
   (package
     (name "bolt-launcher")
-    (version "0.20.6")
+    (version "0.21.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
              (url "https://codeberg.org/Adamcake/Bolt")
-             (commit "542b0d72b90844df909d4c93c0ea75d295ae0c7c")
+             (commit "7b784af90e80b286200f7359f2fced6d8fb6e40e")
              (recursive? #t)))
        (sha256
         (base32 "0jirsr3i2lwq4qz66gc0ykk3fqp0hm5x63qwh9xgwzay5i84l0j1"))))
     (build-system cmake-build-system)
 
-    (inputs (list chromium-embedded-framework-130
+    (inputs (list chromium-embedded-framework
                   eudev
                   libarchive
                   glib
