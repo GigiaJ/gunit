@@ -2,7 +2,7 @@
 ;;; Copyright © 2022 Pierre Neidhardt <mail@ambrevar.xyz>
 
 
-(define-module (nongnu packages chromium)
+(define-module (gunit packages chromium)
   #:use-module ((guix licenses)
                 #:prefix license:)
   #:use-module (guix packages)
