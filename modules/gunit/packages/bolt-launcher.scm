@@ -183,50 +183,58 @@
          "-D BOLT_SKIP_LIBRARIES=1")
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'install 'link-cef
-            (lambda _
-              (map (lambda (entry)
-                     (let* ((source (car entry))
-                            (file (cdr entry)))
-                       (symlink (string-append (assoc-ref %build-inputs source)
-                                               file)
-                                (string-append (assoc-ref %outputs "out")
-                                               "/opt/bolt-launcher/"
-                                               (basename file)))))
-                   (append (map (lambda (file)
-                                  (cons "chromium-embedded-framework" file))
-                                '("/lib/libcef.so" "/share/cef/icudtl.dat"
-                                  "/share/cef/v8_context_snapshot.bin"))
-                           (map (lambda (file)
-                                  (cons "mesa" file))
-                                '("/lib/libGL.so.1" "/lib/libEGL.so.1"
-                                  "/lib/libGLESv2.so.2" "/lib/libvulkan.so.1"))))
-              (wrap-program (string-append (assoc-ref %outputs "out")
-                                           "/opt/bolt-launcher/bolt")
-                `("LD_PRELOAD" ":" prefix
-                  (,(string-append #$(this-package-input "mesa")
-                                   "/lib/libGL.so.1") ,(string-append #$(this-package-input
-                                                                         "mesa")
-                                                        "/lib/libEGL.so.1")
-                   ,(string-append #$(this-package-input "mesa")
-                                   "/lib/libGLESv2.so.2")
-                   ,(string-append #$(this-package-input "mesa")
-                                   "/lib/libvulkan.so.1")))
-                `("LD_LIBRARY_PATH" ":" prefix
-                  (,(string-append #$(this-package-input "mesa") "/lib")
+          (add-after 'install 'link-cef-and-wrap
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (opt-dir (string-append out "/opt/bolt-launcher"))
+                     (bin-dir (string-append out "/bin"))
+                     (cef (assoc-ref inputs "chromium-embedded-framework"))
+                     (mesa (assoc-ref inputs "mesa"))
+                     (vulkan (assoc-ref inputs "vulkan-loader"))
+                     (gtk (assoc-ref inputs "gtk"))
+                     (udev (assoc-ref inputs "eudev"))
+                     (nss (assoc-ref inputs "nss"))
+                     (xdg (assoc-ref inputs "xdg-utils")))
+                
+                (for-each (lambda (file)
+                            (symlink (string-append cef "/share/cef/" file)
+                                     (string-append opt-dir "/" file)))
+                          '("chrome_100_percent.pak" "chrome_200_percent.pak"
+                            "resources.pak" "icudtl.dat"
+                            "v8_context_snapshot.bin"))
 
-                   ,(string-append #$(this-package-input "eudev") "/lib")
-                   ,(string-append #$(this-package-input "nss") "/lib/nss")))
-                `("XDG_DATA_DIRS" ":" prefix
-                  (,(string-append #$(this-package-input "gtk") "/share")))
-                `("PATH" ":" prefix
-                  (,(string-append #$(this-package-input "xdg-utils") "/bin"))))
+                (symlink (string-append cef "/share/cef/locales")
+                         (string-append opt-dir "/locales"))
+                ;;  TODO: should dig into this more so CEF can behave how it expects to
+                ;;                (symlink (string-append mesa "/lib/libGLESv2.so.2")
+                ;;                       (string-append opt-dir "/libGLESv2.so"))
+                (symlink (string-append mesa "/lib/libEGL.so.1")
+                         (string-append opt-dir "/libEGL.so"))
+                (symlink (string-append mesa "/lib/libGL.so.1")
+                         (string-append opt-dir "/libGL.so"))
+                (symlink (string-append cef "/lib/libcef.so")
+                         (string-append opt-dir "/libcef.so"))
 
-              (invoke "mv"
-                      (string-append (assoc-ref %outputs "out")
-                                     "/opt/bolt-launcher/bolt")
-                      (string-append (assoc-ref %outputs "out") "/bin/bolt"))
-              #t)))))
+                (mkdir-p bin-dir)
+                (rename-file (string-append opt-dir "/bolt")
+                             (string-append bin-dir "/bolt"))
+
+                (wrap-program (string-append bin-dir "/bolt")
+                  `("LD_LIBRARY_PATH" ":" prefix
+                    (,(string-append opt-dir) ,(string-append mesa "/lib")
+                     ,(string-append vulkan "/lib")
+                     ,(string-append udev "/lib")
+                     ,(string-append nss "/lib/nss")))
+                  `("XDG_DATA_DIRS" ":" prefix
+                    (,(string-append gtk "/share")))
+                  `("PATH" ":" prefix
+                    (,(string-append xdg "/bin")))
+                  `("LD_PRELOAD" ":" prefix
+                    (,(string-append mesa "/lib/libGL.so.1") ,(string-append
+                                                               mesa
+                                                               "/lib/libEGL.so.1")
+                     ,(string-append mesa "/lib/libGLESv2.so.2")
+                     ,(string-append vulkan "/lib/libvulkan.so.1"))))))))))
     (native-inputs (list cmake pkg-config git wayland))
     (synopsis
      "An alternative third-party open-source launcher for RuneScape or Old School RuneScape.")
