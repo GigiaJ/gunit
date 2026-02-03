@@ -35,6 +35,7 @@
   #:use-module (gnu packages gettext)
   #:use-module (gnu packages ghostscript)
   #:use-module (gnu packages gl)
+  #:use-module (gnu packages gdb)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages golang)
@@ -196,6 +197,7 @@
     ("gdk-pixbuf" ,gdk-pixbuf)
     ("gcc:lib" ,gcc-14 "lib")
     ("openjdk:jdk" ,openjdk "jdk")
+    ("gdb" ,gdb)
     ("glib" ,glib)
     ("glibc" ,glibc)
     ("grep" ,grep)
@@ -281,3 +283,4 @@
 (define-public ghidra
   (nonguix-container->package ghidra-container))
 
+ghidra
