@@ -32,7 +32,7 @@
                           ;; Automatically respawn the service if it terminates unexpectedly.
                           (respawn? #t))))
 
-(define code-server-service-type
+(define home-code-server-service-type
   (service-type (name 'code-server)
                 ;; This links our custom 'code-server-service' implementation to the main user Shepherd service.
                 (extensions (list (service-extension
