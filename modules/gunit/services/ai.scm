@@ -3,7 +3,6 @@
   #:use-module (guix gexp)
   #:use-module (gnu services)
   #:use-module (gnu home services)
-  #:use-module (shepherd support)
   #:use-module (gnu home services shepherd)
   #:use-module (guix packages)
   #:export (home-ollama-service-type))
