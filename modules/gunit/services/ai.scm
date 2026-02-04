@@ -3,8 +3,10 @@
   #:use-module (guix gexp)
   #:use-module (gnu services)
   #:use-module (gnu home services)
+  #:use-module (shepherd support)
   #:use-module (gnu home services shepherd)
-  #:use-module (guix packages))
+  #:use-module (guix packages)
+  #:export (home-ollama-service-type))
 
 (define (ollama-home-service config)
   (list (shepherd-service (documentation "Run the Ollama LLM backend.")
@@ -31,4 +33,3 @@
                 (default-value #t)
                 (description "A user service to run the Ollama LLM server.")))
 
-home-ollama-service-type
