@@ -159,6 +159,3 @@
                        (string-append "<style>"
                                       (string-join css-rules "\n")
                                       "</style></head>")))))))))))))
-
-(make-code-server-with-font code-server font-nerd-fonts-jetbrains-mono
-                            "JetBrainsMonoNerdFontMono-")
