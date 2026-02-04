@@ -1,4 +1,3 @@
-;; From: https://github.com/laura240406/lauras-channel/tree/master
 (define-module (gunit packages go-common)
   #:use-module (guix)
   #:use-module (guix packages)
@@ -918,7 +917,7 @@ and spf13/pflag with enumeration flags.")
     (build-system go-build-system)
     (arguments
      (list
-          #:tests? #f
+      #:tests? #f
       #:import-path "github.com/apache/arrow/go/arrow"
       #:unpack-path "github.com/apache/arrow"))
     (propagated-inputs (list go-google-golang-org-protobuf
@@ -952,7 +951,7 @@ and spf13/pflag with enumeration flags.")
     (build-system go-build-system)
     (arguments
      (list
-     #:tests? #f
+      #:tests? #f
       #:import-path "github.com/chewxy/hm"))
     (propagated-inputs (list go-github-com-pkg-errors go-github-com-xtgo-set
                              go-github-com-stretchr-testify))
@@ -1258,7 +1257,7 @@ ordered sets.")
      "Package tensor is a package that provides efficient, generic n-dimensional
 arrays in Go.  Also in this package are functions and methods that are used
 commonly in arithmetic, comparison and linear algebra operations.")
-    (license license:asl2.0)))    
+    (license license:asl2.0)))
 
 (define-public go-github-com-dlclark-regexp2-v1.11.5
   (package
@@ -1276,7 +1275,7 @@ commonly in arithmetic, comparison and linear algebra operations.")
     (build-system go-build-system)
     (arguments
      (list
-     #:tests? #f
+      #:tests? #f
       #:import-path "github.com/dlclark/regexp2"))
     (home-page "https://github.com/dlclark/regexp2/")
     (synopsis "Full featured regular expressions for Go")
@@ -1973,11 +1972,10 @@ Editor.")
         (base32 "0zhnrih2px6jm8nxzkz8s7va3lj03bzwxim8wjba9zh7i78bp67z"))))
     (build-system go-build-system)
     (arguments
-     (list 
-     #:tests? #f
-     #:import-path "github.com/olekukonko/tablewriter"))
-    (propagated-inputs
-     (list go-github-com-mattn-go-runewidth))
+     (list
+      #:tests? #f
+      #:import-path "github.com/olekukonko/tablewriter"))
+    (propagated-inputs (list go-github-com-mattn-go-runewidth))
     (home-page "https://github.com/olekukonko/tablewriter")
     (synopsis "Generate ASCII tables in Go")
     (description
@@ -2002,8 +2000,7 @@ Editor.")
      (list
       #:tests? #f
       #:import-path "github.com/bahlo/generic-list-go"))
-    (native-inputs
-     (list go-github-com-stretchr-testify))
+    (native-inputs (list go-github-com-stretchr-testify))
     (home-page "https://github.com/bahlo/generic-list-go")
     (synopsis "Generic linked list implementation for Go")
     (description
@@ -2028,12 +2025,10 @@ using Go generics.")
     (arguments
      (list
       #:import-path "github.com/wk8/go-ordered-map/v2"))
-    (native-inputs
-     (list go-github-com-stretchr-testify))
-    (propagated-inputs
-     (list go-github-com-bahlo-generic-list-go
-           go-github-com-buger-jsonparser
-           go-github-com-mailru-easyjson))
+    (native-inputs (list go-github-com-stretchr-testify))
+    (propagated-inputs (list go-github-com-bahlo-generic-list-go
+                             go-github-com-buger-jsonparser
+                             go-github-com-mailru-easyjson))
     (home-page "https://github.com/wk8/go-ordered-map")
     (synopsis "Ordered map in Go with generic support")
     (description
@@ -2055,22 +2050,20 @@ from Go 1.18+) and provides efficient O(1) lookups.")
        (file-name (git-file-name name version))
        (sha256
         (base32 "1vxzrlars1ml8n0acc7f2ja8c5d4kbair8ryfm5s29i5i5b7p7z2"))
-        (modules '((guix build utils)))
-    (snippet
-        '(begin
-           (use-modules (guix build utils))
-           (substitute* (find-files "." "\\.go$")
-             (("gorgonia.org/tensor") "github.com/pdevine/tensor"))
-           #t))
-      ))
+       (modules '((guix build utils)))
+       (snippet '(begin
+                   (use-modules (guix build utils))
+                   (substitute* (find-files "." "\\.go$")
+                     (("gorgonia.org/tensor")
+                      "github.com/pdevine/tensor")) #t))))
     (build-system go-build-system)
     (arguments
      (list
       #:tests? #f
-      #:unpack-path "github.com/pdevine/tensor" 
-      #:import-path "github.com/pdevine/tensor" 
-    
-    ))
+      #:unpack-path "github.com/pdevine/tensor"
+      #:import-path "github.com/pdevine/tensor"
+
+      ))
     (propagated-inputs (list go-gorgonia-org-vecf64
                              go-gorgonia-org-vecf32
                              go-gorgonia-org-tensor
@@ -2091,4 +2084,87 @@ from Go 1.18+) and provides efficient O(1) lookups.")
      "Package tensor is a package that provides efficient, generic n-dimensional
 arrays in Go.  Also in this package are functions and methods that are used
 commonly in arithmetic, comparison and linear algebra operations.")
+    (license license:asl2.0)))
+
+(define-public go-github-com-thetitanrain-w32
+  (package
+    (name "go-github-com-thetitanrain-w32")
+    (version "0.0.0-20200114052255-2654d97dbd3d")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/TheTitanrain/w32")
+             (commit (go-version->git-ref version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "09r83rg4ms4cwsv5rksp5wclwr28q8v41mg1cs2vaz6fjjh66ym4"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:import-path "github.com/TheTitanrain/w32"
+      #:unpack-path "github.com/TheTitanrain/w32"
+      #:tests? #f ; Can't run Windows tests on Linux
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'setup-go-environment 'set-windows-target
+            (lambda _
+              (setenv "GOOS" "windows")
+              (setenv "GOARCH" "amd64"))))))
+    (home-page "https://github.com/TheTitanrain/w32")
+    (synopsis "About w32")
+    (description
+     "w32 is a wrapper of windows apis for the Go Programming Language.")
+    (license license:bsd-3)))
+
+(define-public go-github-com-tkrajina-go-reflector
+  (package
+    (name "go-github-com-tkrajina-go-reflector")
+    (version "0.5.8")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/tkrajina/go-reflector")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "151jcf23spwb0ggb57q58dj6wb0qmmmbafzdrdw4namcql2aix5v"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:import-path "github.com/tkrajina/go-reflector/reflector"
+      #:unpack-path "github.com/tkrajina/go-reflector"))
+    (propagated-inputs (list go-github-com-stretchr-testify))
+    (home-page "https://github.com/tkrajina/go-reflector")
+    (synopsis "Golang reflector")
+    (description "First of all, don't use reflection if you don't have to.")
+    (license license:asl2.0)))
+
+(define-public go-github-com-tkrajina-typescriptify-golang-structs
+  (package
+    (name "go-github-com-tkrajina-typescriptify-golang-structs")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/tkrajina/typescriptify-golang-structs")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "01adp4zbdk8364z416hfqwjcs22b7mm0ihpvh4aky2f8x3flv5ll"))))
+    (build-system go-build-system)
+    (arguments
+     (list
+      #:tests? #f
+      #:import-path
+      "github.com/tkrajina/typescriptify-golang-structs/typescriptify"
+      #:unpack-path "github.com/tkrajina/typescriptify-golang-structs"))
+    (propagated-inputs (list go-github-com-stretchr-testify
+                             go-github-com-tkrajina-go-reflector))
+    (home-page "https://github.com/tkrajina/typescriptify-golang-structs")
+    (synopsis "A Golang JSON to TypeScript model converter")
+    (description "The command-line tool:.")
     (license license:asl2.0)))
