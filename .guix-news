@@ -5,4 +5,11 @@
   (title (en "Revised for general release")
          (eo "Reviziita por ĝenerala liberigo"))
   (body (en "Channel revised to be streamlined, signed, and more appropriate for general usage.")
-        (eo " Kanalo reviziita por esti flulinia, subskribita, kaj pli konvena por ĝenerala uzokutimo."))))
+        (eo " Kanalo reviziita por esti flulinia, subskribita, kaj pli konvena por ĝenerala uzokutimo.")))
+        (entry
+ (commit "0698a00da0e25466ba7e048ec3dd10eadfda943b")
+ (title (en "New arrivals: AI, Reverse Engineering, and Gaming")
+        (eo "Novaj alvenoj: AI, Inversa Inĝenierarto, kaj Videoludado"))
+ (body (en "Significant expansion of the package collection: Added Ollama for local AI workloads, Ghidra for reverse engineering (FHS-wrapped), and the Millennium mixin for Steam. This update also replaces the non-functional RuneScape launcher with Bolt Launcher and introduces dedicated Guix Home services for Ollama and Code-server.")
+       (eo "Signifa vastiĝo de la pakaĵkolekto: Aldonita Ollama por lokaj AI-taskoj, Ghidra por inversa inĝenierarto (FHS-pakita), kaj la Millennium-miksaĵo por Steam. Ĉi tiu ĝisdatigo ankaŭ anstataŭigas la nefunkcian RuneScape-lanĉilon per Bolt Launcher kaj prezentas dediĉitajn Guix Home-servojn por Ollama kaj Code-server.")))
+        )
