@@ -35,7 +35,7 @@
 (define-public ultimatevocalremovergui
   (package
     (name "ultimatevocalremovergui")
-    (version "5.6.1")
+    (version "5.6.2")
     (source
      (origin
        (method git-fetch)
