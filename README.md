@@ -34,7 +34,9 @@ These are packages that even if upstreamed at some point, I'll upkeep for person
       - The most feature complete IDE for writing Java.
 - **AI**
   - [Ollama](https://ollama.com/)
-    - A CLI tool that handles loading models and such for frontend tools. Best describable as Docker for LLMs. Tools like Continue for VSCode support it
+    - A CLI tool that handles loading models and such for frontend tools. Best describable as Docker for LLMs. Tools like Continue for VSCode support it.
+  - [Ultimate Vocal Remover](https://github.com/Anjok07/ultimatevocalremovergui)
+    - A tool to remove the vocals (or instrumentals) from a song using AI models (NVIDIA only sadly)
 - **Reverse Engineering**
   - [Ghidra](https://github.com/NationalSecurityAgency/ghidra)
     - Between this and IDA Pro, this is really the only open-source option that fits into the Guix ecosystem. Runs in an FHS container as Ghidra expects to find system libraries in their FHS locations. Uses the prebuilt binary as Ghidra is written in Java and uses Gradle as the build tool. Since Gradle is exceptionally difficult to package for on Guix it is more reasonable to do it this way. Not ideal, but the alternative would take an unreasonable amount of time.
@@ -45,6 +47,12 @@ These are packages that even if upstreamed at some point, I'll upkeep for person
   - [OBS Droidcam](https://obsproject.com/forum/resources/droidcam-obs-camera.1308/)
     - Plugin for using your phone as a microphone and camera for OBS.
 
+---
+- **Firmware or files required for functionality**
+  - Studio One 6
+  - T2 Firmware (for Macs)
+
+These are quite opinionated on where those local files live, so feel free to change those too.
 
 ---
 These are more experimental ones thrown together either for specific behavior or to update without waiting on upstream.
@@ -55,14 +63,22 @@ These are more experimental ones thrown together either for specific behavior or
     - Many QT6 packages simply aren't updated and I didn't feel like updating them at the time
   - Discord
     - This one isn't particularly hard. I think the Linux client is an inferior experience to using the browser though.
-- **Working on**
-  - UVR
-  - StudioOne (mostly has to be a deb unwrapper... this one isn't ideal)
+
+---
 
 ## Services
   #### Home
   - Code server
   - Ollama
+
+---
+
+## Extension commands
+- toys
+  - An extension command that can be used like `guix toys -q "package-name"` or `guix toys -t channel -q "nonguix"`. It is just a lookup and parser for the website itself, but still handy to avoid having to leave editor or terminal to see if a package exists.
+
+These are a neat feature not documented in the Guix Manual that I could find. They work through the basis of creating a module with the path in your channel like in this one root/modules/guix/scripts/extension-command-script.scm
+
 ---
 
 Credits to [Look](https://codeberg.org/look/saayix) for such a clear repo layout.
