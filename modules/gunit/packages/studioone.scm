@@ -64,7 +64,8 @@
     (name "studio-one")
     (version "6.0.0-beta")
     (source
-     (local-file "packages/studioone6.deb"
+     (local-file (string-append (getenv "HOME")
+                                "/.config/guix/blobs/studioone6.deb")
                  #:recursive? #t))
     (build-system gnu-build-system)
     (arguments
