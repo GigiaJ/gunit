@@ -116,7 +116,15 @@ exec \"~a\" UVR.py \"$@\"
                   `("GUIX_PYTHONPATH" ":" prefix
                     (,(getenv "GUIX_PYTHONPATH") ,share))
                   `("GI_TYPELIB_PATH" ":" prefix
-                    (,(getenv "GI_TYPELIB_PATH"))))
+                    (,(getenv "GI_TYPELIB_PATH")))
+                  `("PATH" ":" prefix
+                    (,(string-append (assoc-ref inputs "xrandr") "/bin")))
+                  `("LD_LIBRARY_PATH" ":" prefix
+                    (,(string-append (assoc-ref inputs "libx11") "/lib") ,(string-append
+                                                                           (assoc-ref
+                                                                            inputs
+                                                                            "libxrandr")
+                                                                           "/lib"))))
                 #t)))
           (add-after 'install 'add-desktop-file
             (lambda* (#:key outputs #:allow-other-keys)
@@ -182,7 +190,7 @@ Categories=AudioVideo;Audio;AudioVideoEditing;
               ("nss" ,nss)
               ("nss-certs" ,nss-certs)
               ("kmod" ,kmod)
-              ("mesa-utils" ,mesa-utils)
+              ("nvda-utils" ,nvda-utils)
               ("grep" ,grep)))
     (home-page "https://github.com/Anjok07/ultimatevocalremovergui")
     (synopsis "GUI for a Vocal Remover that uses Deep Neural Networks. ")
