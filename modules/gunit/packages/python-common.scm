@@ -1,4 +1,4 @@
-(define-module (modules gunit packages python-common)
+(define-module (gunit packages python-common)
   #:use-module (guix packages)
   #:use-module (guix profiles)
   #:use-module (gnu packages base)
