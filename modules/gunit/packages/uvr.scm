@@ -190,7 +190,7 @@ Categories=AudioVideo;Audio;AudioVideoEditing;
               ("nss" ,nss)
               ("nss-certs" ,nss-certs)
               ("kmod" ,kmod)
-              ("nvda-utils" ,nvda-utils)
+              ("mesa-utils" ,mesa-utils)
               ("grep" ,grep)))
     (home-page "https://github.com/Anjok07/ultimatevocalremovergui")
     (synopsis "GUI for a Vocal Remover that uses Deep Neural Networks. ")
