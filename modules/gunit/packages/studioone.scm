@@ -1,4 +1,4 @@
-(define-module (gunit packages studio-one)
+(define-module (gunit packages studioone)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix gexp)
