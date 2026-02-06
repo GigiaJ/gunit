@@ -44,11 +44,11 @@
   #:use-module (gunit packages rocm-hip)
   #:use-module (gunit packages go-common))
 
-;;(define-public cuda-union
+;;(define cuda-union
 ;;  )
 
 
-(define-public rocm-union
+(define rocm-union
   (package
     (name "rocm-union")
     (version "6.2.2")
@@ -84,7 +84,7 @@
      "A merged directory of ROCm libraries to simplify LD_LIBRARY_PATH.")
     (license license:expat)))
 
-(define-public vulkan-union
+(define vulkan-union
   (package
     (name "vulkan-union")
     (version "1.4.321")
@@ -116,7 +116,7 @@
      "A merged directory of Vulkan libraries to simplify LD_LIBRARY_PATH.")
     (license license:expat)))
 
-(define-public ollama-libs
+(define ollama-libs
   (package
     (name "ollama-libs")
     (version "0.12.3")
@@ -135,10 +135,6 @@
      (list
       #:build-type "Release"
       #:tests? #f
-      #:build-flags
-      #~(list (string-append
-               "-ldflags=-X github.com/ollama/ollama/server.RunnerDir="
-               #$output "/lib/ollama"))
       #:configure-flags
       #~(let ((rocm (assoc-ref %build-inputs "rocm-union")))
           (list "-DCMAKE_SKIP_BUILD_RPATH=ON"
