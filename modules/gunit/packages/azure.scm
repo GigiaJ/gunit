@@ -20,7 +20,7 @@
 (define-public azure-cli
   (package
     (name "azure-cli")
-    (version "2.82.0-1")
+    (version "2.83.0")
     (source
      (origin
        (method url-fetch)
@@ -32,11 +32,11 @@
                            name
                            "_"
                            version
-                           "~"
+                           "-1~"
                            "bookworm_amd64.deb"))
        (file-name (string-append name "-" version "_bookworm_amd64.deb"))
        (sha256
-        (base32 "045mx5j2hhrbh54brg6w2z9v59x3yzapq474k2iz2f3virfkhchz"))))
+        (base32 "1xb1h2bmzab4a73wdp5c1lwpzawsnhsbb80xsrg147ip6ia4bnv6"))))
     (build-system gnu-build-system)
     (arguments
      (list
