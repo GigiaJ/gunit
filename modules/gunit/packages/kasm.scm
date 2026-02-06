@@ -1,4 +1,4 @@
-(define-module (gunit packages kasmvnc)
+(define-module (gunit packages kasm)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
