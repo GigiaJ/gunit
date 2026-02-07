@@ -198,7 +198,7 @@
 
 (define-public emacs-eaf-browser
   (package
-    (name "eaf-browser")
+    (name "emacs-eaf-browser")
     (version "2026.02.07")
     (source
      (origin
