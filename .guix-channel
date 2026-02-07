@@ -21,20 +21,4 @@
     (channel-introduction
      (version 0)
      (commit "5d1270d51c64457d61cd46ec96e5599176f315a4")
-     (signer "C780 21F7 34E4 07EB 9090 0CF1 4ACA 6D6F 89AB 3162"))))
-  (channel
-   (name guix-science)
-   (url "https://codeberg.org/guix-science/guix-science.git")
-   (introduction
-    (channel-introduction
-     (version 0)
-     (commit "b1fe5aaff3ab48e798a4cce02f0212bc91f423dc")
-     (signer "CA4F 8CF4 37D7 478F DA05 5FD4 4213 7701 1A37 8446"))))
-  (channel
-   (name guix-science-nonfree)
-   (url "https://codeberg.org/guix-science/guix-science-nonfree.git")
-   (introduction
-    (channel-introduction
-     (version 0)
-     (commit "58661b110325fd5d9b40e6f0177cc486a615817e")
-     (signer "CA4F 8CF4 37D7 478F DA05 5FD4 4213 7701 1A37 8446"))))))
+     (signer "C780 21F7 34E4 07EB 9090 0CF1 4ACA 6D6F 89AB 3162"))))))
