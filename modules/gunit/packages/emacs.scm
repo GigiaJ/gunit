@@ -127,6 +127,7 @@
 
 (define-public emacs-eaf
   (package
+    ;; ... (name, version, source, build-system stay the same) ...
     (name "emacs-eaf")
     (version "0.5")
     (source
@@ -179,54 +180,79 @@
                         "-linput"
                         "-levdev"
                         "-ludev")))))))
-    (inputs (list python
-                  python-pyqt
-                  python-pyqtwebengine-6
-                  libinput
-                  python-epc
-                  python-sexpdata
-                  libinput
-                  libevdev
-                  eudev
-                  gcc
-                  pkg-config))
-    (propagated-inputs (list emacs-minimal emacs-epc))
+    (propagated-inputs (list python
+                             python-pyqt
+                             python-pyqtwebengine-6
+                             libinput
+                             python-epc
+                             python-sexpdata
+                             libevdev
+                             eudev
+                             emacs-minimal
+                             emacs-epc
+                             gcc
+                             pkg-config))
     (home-page "https://github.com/emacs-eaf/emacs-application-framework")
     (synopsis "Graphical application framework for Emacs")
     (description "EAF allows Emacs to run full-featured GUI applications.")
     (license license:gpl3+)))
 
 (define-public emacs-eaf-browser
-  (package
-    (name "emacs-eaf-browser")
-    (version "2026.02.07")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/emacs-eaf/eaf-browser.git")
-             (commit "master")))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0svypmag4k2nmpb1lrd96ngnljs94yxxij027n0j2vbms1rfphqf"))))
-    (build-system emacs-build-system)
-    (arguments
-     (list
-      #:include
-      #~(cons* "buffer.py" "aria2-ng" "easylist.txt" %default-include)
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'install 'wrap-binaries
-            (lambda* (#:key inputs outputs #:allow-other-keys)
-              (let* ((out (assoc-ref outputs "out"))
-                     (aria2 (search-input-file inputs "/bin/aria2c")))
-                (format #t
-                        "Browser installed. Ensure aria2 is in your PATH.~%")))))))
-    (inputs (list python-pyqt python-pyqtwebengine-6 python-pysocks aria2))
-    (propagated-inputs (list emacs-eaf))
-    (home-page "https://github.com/emacs-eaf/eaf-browser")
-    (synopsis "EAF web browser application")
-    (description "A modern browser for Emacs using PyQtWebEngine.")
-    (license license:gpl3+)))
+  (let ((darkreader (origin
+                      (method url-fetch)
+                      (uri
+                       "https://registry.npmjs.org/darkreader/-/darkreader-4.9.58.tgz")
+                      (sha256 (base32
+                               "1b1qaynsslkcsxxcqm28h62g6g2zn9v2zynywnyy69d4c7hd1mr5"))))
+        (readability (origin
+                       (method url-fetch)
+                       (uri
+                        "https://registry.npmjs.org/@mozilla/readability/-/readability-0.6.0.tgz")
+                       (sha256 (base32
+                                "06frg9i7ajd4w0m5yn0x5lkd535msmkdrsjxj91valdd1p2kqg3d")))))
+    (package
+      (name "emacs-eaf-browser")
+      (version "2026.02.07")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/emacs-eaf/eaf-browser.git")
+               (commit "master")))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0svypmag4k2nmpb1lrd96ngnljs94yxxij027n0j2vbms1rfphqf"))))
+      (build-system emacs-build-system)
+      (arguments
+       (list
+        #:include
+        #~(cons* "buffer.py" "node_modules" %default-include)
+        #:phases
+        #~(modify-phases %standard-phases
+            (add-after 'unpack 'install-js-deps
+              (lambda* (#:key inputs #:allow-other-keys)
+                (let ((node-dir "node_modules"))
+                  (mkdir-p (string-append node-dir "/darkreader"))
+                  (mkdir-p (string-append node-dir "/@mozilla/readability"))
+                  (invoke "tar"
+                          "-xf"
+                          #+darkreader
+                          "-C"
+                          (string-append node-dir "/darkreader")
+                          "--strip-components=1")
 
-emacs-eaf
+                  (invoke "tar"
+                          "-xf"
+                          #+readability
+                          "-C"
+                          (string-append node-dir "/@mozilla/readability")
+                          "--strip-components=1")
+                  #t))))))
+      (inputs (list python-pyqt python-pyqtwebengine-6 python-pysocks aria2))
+      (propagated-inputs (list emacs-eaf))
+      (home-page "https://github.com/emacs-eaf/eaf-browser")
+      (synopsis "EAF web browser application")
+      (description "A modern browser for Emacs using PyQtWebEngine.")
+      (license license:gpl3+))))
+
+emacs-eaf-browser
