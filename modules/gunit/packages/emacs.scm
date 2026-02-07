@@ -142,7 +142,7 @@
     (arguments
      (list
       #:include
-      #~(cons* "app" "core" "reinput" %default-include)
+      #~(cons* "eaf.py" "core" "app" "reinput" %default-include)
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'unpack 'patch-paths
@@ -212,6 +212,8 @@
     (build-system emacs-build-system)
     (arguments
      (list
+      #:include
+      #~(cons* "buffer.py" "aria2-ng" "easylist.txt" %default-include)
       #:phases
       #~(modify-phases %standard-phases
           (add-after 'install 'wrap-binaries
@@ -227,3 +229,4 @@
     (description "A modern browser for Emacs using PyQtWebEngine.")
     (license license:gpl3+)))
 
+emacs-eaf
