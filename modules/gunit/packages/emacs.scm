@@ -127,7 +127,6 @@
 
 (define-public emacs-eaf
   (package
-    ;; ... (name, version, source, build-system stay the same) ...
     (name "emacs-eaf")
     (version "0.5")
     (source
@@ -248,8 +247,13 @@
                           (string-append node-dir "/@mozilla/readability")
                           "--strip-components=1")
                   #t))))))
-      (inputs (list python-pyqt python-pyqtwebengine-6 python-pysocks aria2))
-      (propagated-inputs (list emacs-eaf))
+      (inputs (list aria2))
+      (propagated-inputs (list emacs-eaf
+                               python-pyqt
+                               python-pyqtwebengine-6
+                               python-pyqt6-sip
+                               python-sip
+                               python-pysocks))
       (home-page "https://github.com/emacs-eaf/eaf-browser")
       (synopsis "EAF web browser application")
       (description "A modern browser for Emacs using PyQtWebEngine.")
