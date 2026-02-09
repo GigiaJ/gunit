@@ -222,10 +222,9 @@
          (sha256
           (base32 "0svypmag4k2nmpb1lrd96ngnljs94yxxij027n0j2vbms1rfphqf"))))
       (build-system emacs-build-system)
-      (arguments
+(arguments
        (list
-        #:include
-        #~(cons* "buffer.py" "node_modules" %default-include)
+        #:include #~(cons* "buffer.py" %default-include)
         #:phases
         #~(modify-phases %standard-phases
             (add-after 'unpack 'install-js-deps
@@ -233,20 +232,16 @@
                 (let ((node-dir "node_modules"))
                   (mkdir-p (string-append node-dir "/darkreader"))
                   (mkdir-p (string-append node-dir "/@mozilla/readability"))
-                  (invoke "tar"
-                          "-xf"
-                          #+darkreader
-                          "-C"
-                          (string-append node-dir "/darkreader")
-                          "--strip-components=1")
-
-                  (invoke "tar"
-                          "-xf"
-                          #+readability
-                          "-C"
-                          (string-append node-dir "/@mozilla/readability")
-                          "--strip-components=1")
-                  #t))))))
+                  (invoke "tar" "-xf" #+darkreader "-C" 
+                          (string-append node-dir "/darkreader") "--strip-components=1")
+                  (invoke "tar" "-xf" #+readability "-C" 
+                          (string-append node-dir "/@mozilla/readability") "--strip-components=1"))))
+            (add-after 'install 'install-node-modules
+              (lambda* (#:key outputs #:allow-other-keys)
+                (let* ((out (assoc-ref outputs "out"))
+                       (site-lisp (string-append out "/share/emacs/site-lisp/eaf-browser-" #$version)))
+                  (copy-recursively "node_modules" 
+                                    (string-append site-lisp "/node_modules"))))))))
       (inputs (list aria2))
       (propagated-inputs (list emacs-eaf
                                python-pyqt
