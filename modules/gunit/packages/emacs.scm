@@ -127,7 +127,7 @@
 
 (define-public emacs-application-framework
   (package
-    (name "emacs-eaf")
+    (name "emacs-application-framework")
     (version "0.5")
     (source
      (origin
