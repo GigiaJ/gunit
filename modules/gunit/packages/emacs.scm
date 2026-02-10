@@ -187,6 +187,7 @@
     (propagated-inputs (list python
                              python-pyqt-6
                              python-pyqtwebengine-6
+                             emacs-all-the-icons
                              libinput
                              python-epc
                              python-sexpdata
