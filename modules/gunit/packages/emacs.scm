@@ -125,7 +125,7 @@
   #:use-module (nonguix multiarch-container)
   #:use-module (nonguix utils))
 
-(define-public emacs-eaf
+(define-public emacs-application-framework
   (package
     (name "emacs-eaf")
     (version "0.5")
@@ -180,7 +180,7 @@
                         "-levdev"
                         "-ludev")))))))
     (propagated-inputs (list python
-                             python-pyqt
+                             python-pyqt-6
                              python-pyqtwebengine-6
                              libinput
                              python-epc
@@ -243,8 +243,8 @@
                   (copy-recursively "node_modules" 
                                     (string-append site-lisp "/node_modules"))))))))
       (inputs (list aria2))
-      (propagated-inputs (list emacs-eaf
-                               python-pyqt
+      (propagated-inputs (list emacs-application-framework
+                               python-pyqt-6
                                python-pyqtwebengine-6
                                python-pyqt6-sip
                                python-sip
