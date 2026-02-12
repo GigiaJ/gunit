@@ -5,6 +5,7 @@
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (guix packages)
+  #:use-module (gnu packages linux)
   #:use-module (gnu packages)
   #:export (home-obs-virtual-mic-service-type))
 
