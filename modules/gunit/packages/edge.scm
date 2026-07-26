@@ -180,10 +180,10 @@
       (license (nonfree "https://www.microsoft.com/intl/en/edge/terms/")))))
 
 (define-public microsoft-edge-stable
-  (make-microsoft-edge "stable" "140.0.3485.81"
+  (make-microsoft-edge "stable" "150.0.4078.99"
                        "1psc07mjlwnra91zdhjwda9cp46hq5k86psq7md2hiwp2b8znrgh"))
 
 (define-public microsoft-edge-beta
-  (make-microsoft-edge "beta" "141.0.3537.36"
+  (make-microsoft-edge "beta" "151.0.4129.35"
                        "0d4m38xbnpbb98y5xz9h5rzzcfshl01c2l3f794jg6al20yc2jj7"))
 
