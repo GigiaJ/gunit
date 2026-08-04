@@ -10,7 +10,6 @@
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages elf)
-  #:use-module (selected-guix-works packages fonts)
   #:use-module (guix build-system copy)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 ftw)
