@@ -66,8 +66,8 @@
                    ;; "libaugloop_client.so"
                    "liblearning_tools.so"
                    ;; "libmicrosoft-apis.so"
-                   "libmip_core.so"
-                   "libmip_protection_sdk.so"
+;;                   "libmip_core.so"
+;;                   "libmip_protection_sdk.so"
                    "liboneauth.so"
                    "liboneds.so"
                    "libqt5_shim.so"
@@ -112,12 +112,15 @@
                                 #$appname ".xml")
                     ((old-exe)
                      exe))
-                  (substitute* (string-append usr/share "/menu/microsoft-"
-                                              #$appname ".menu")
-                    (("/opt")
-                     share)
-                    ((old-exe)
-                     exe)))))
+                  ;;(substitute* (string-append usr/share "/menu/microsoft-"
+                                 ;;             #$appname ".menu")
+;;                    (("/opt")
+  ;;                   share)
+    ;;                ((old-exe)
+                  ;;   exe)
+                  ;;)
+
+                  )))
             (add-after 'install 'install-icons
               (lambda _
                 (define (format-icon-size name)
