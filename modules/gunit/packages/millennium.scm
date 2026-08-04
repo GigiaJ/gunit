@@ -370,22 +370,19 @@ exec \"~a\" \"$@\"
 
 
 (define (steam-container-for driver)
-  (nonguix-container
-   (name "steam-m")
-   (wrap-package steam-millennium)
-   (run "/bin/steam")
-   (packages
-    (modify-inputs steam-container-libs
-      (replace "mesa" driver)))
-   (preserved-env %nvidia-environment-variable-regexps)
-   (link-files '("share"))
-(exposed
- (list
-  #~#$(file-append steam-millennium
-                   "/share/python-i686-3.11.8=/opt/python-i686-3.11.8")
-                  #~#$(file-append steam-millennium
-                   "/share/millennium/pipx=/usr/share/millennium/assets/pipx")))
-   (description "Steam is a digital software distribution platform created by
+  (nonguix-container (name "steam-m")
+                     (wrap-package steam-millennium)
+                     (run "/bin/steam")
+                     (packages (modify-inputs steam-container-libs
+                                 (replace "mesa" driver)))
+;;                     (preserved-env %nvidia-environment-variable-regexps)
+                     (link-files '("share"))
+                     (exposed (list #~#$(file-append steam-millennium
+                                         "/share/python-i686-3.11.8=/opt/python-i686-3.11.8")
+                                    #~#$(file-append steam-millennium
+                                         "/share/millennium/pipx=/usr/share/millennium/assets/pipx")))
+                     (description
+                      "Steam is a digital software distribution platform created by
 Valve.  This package provides a script for launching Steam in a Guix container
 which will use the directory @file{$HOME/.local/share/guix-sandbox-home} where
 all games will be installed.")))
