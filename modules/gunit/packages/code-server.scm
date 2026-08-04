@@ -11,7 +11,6 @@
   #:use-module (gnu packages version-control)
   #:use-module (gnu packages fontutils)
   #:use-module (gnu packages elf)
-  #:use-module (selected-guix-works packages fonts)
   #:use-module (guix utils)
   #:use-module (guix build-system copy)
   #:use-module (guix build copy-build-system)
@@ -145,7 +144,7 @@
                                                          file))
                                                   (weight (car meta))
                                                   (style (cdr meta)))
-                                             
+
                                              (symlink src dest)
                                              (invoke "sfnt2woff" dest)
                                              (delete-file dest)
@@ -153,9 +152,10 @@
                                              (format #f
                                               "@font-face { font-family: 'Personal'; font-weight: ~a; font-style: ~a; src: url('{{BASE}}/_static/src/browser/pages/~a') format('woff'); }"
                                               weight style woff-name))) files)))
-                    
                     (substitute* workbench-html
                       (("</head>")
                        (string-append "<style>"
                                       (string-join css-rules "\n")
                                       "</style></head>")))))))))))))
+
+
