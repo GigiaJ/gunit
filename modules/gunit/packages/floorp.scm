@@ -63,7 +63,7 @@
 (define-public floorp
   (package
     (name "floorp")
-    (version "12.10.2")
+    (version "12.16.4")
     (source
      (origin
        (method url-fetch)
@@ -71,7 +71,7 @@
              "https://github.com/Floorp-Projects/Floorp/releases/download/v"
              version "/floorp-linux-x86_64.tar.xz"))
        (sha256
-        (base32 "04697gss404bzf8kcj8ihz00bhwgl9qal2ci5iv6l2mp2rjfq540"))))
+        (base32 "1xxxk4ajyddq89fzxlkkhnap35krvs4b136harg0y3h0mkqzr4ji"))))
     (build-system copy-build-system)
     (inputs (list alsa-lib
                   bash-minimal
