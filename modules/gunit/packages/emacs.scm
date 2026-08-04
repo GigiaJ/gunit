@@ -226,7 +226,7 @@
                (commit "master")))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0svypmag4k2nmpb1lrd96ngnljs94yxxij027n0j2vbms1rfphqf"))))
+          (base32 "1kk4q7gsfg49n80s6rfqqkjqgzillmdiqxkqnp5xz959s6r2bifb"))))
       (build-system emacs-build-system)
       (arguments
        (list
