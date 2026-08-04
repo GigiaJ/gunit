@@ -181,7 +181,8 @@
 
 (define-public microsoft-edge-stable
   (make-microsoft-edge "stable" "150.0.4078.99"
-                       "1psc07mjlwnra91zdhjwda9cp46hq5k86psq7md2hiwp2b8znrgh"))
+                       "0p36fav27ik5yjs3k93lvgjsymfi9ysnwg9v5nkjpqhhz753va26"
+                                              ))
 
 (define-public microsoft-edge-beta
   (make-microsoft-edge "beta" "151.0.4129.35"
