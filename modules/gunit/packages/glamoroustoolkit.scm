@@ -28,7 +28,7 @@
 (define-public glamoroustoolkit
   (package
     (name "glamoroustoolkit")
-    (version "1.1.58")
+    (version "1.1.547")
     (source
      (origin
        (method url-fetch)
@@ -162,7 +162,7 @@
                         (format port "  if [ ! -f \"$GT_IMAGE\" ]; then\n")
                         (format port "    echo \"Downloading Glamorous Toolkit image...\"\n")
                         (format port "    mkdir -p \"$GT_DIR\"\n")
-                        (format port "    ~a/bin/curl --capath \"$SSL_CERT_DIR\" -f -# -L -o \"$GT_DIR/GlamorousToolkit.zip\" https://github.com/feenkcom/gtoolkit/releases/download/v1.1.58/GlamorousToolkit-image-without-world.zip\n" curl)
+                        (format port "    ~a/bin/curl --capath \"$SSL_CERT_DIR\" -f -# -L -o \"$GT_DIR/GlamorousToolkit.zip\" https://github.com/feenkcom/gtoolkit/releases/download/v1.1.547/GlamorousToolkit-Linux-x86_64-v1.1.547.zip\n" curl)
                         (format port "    if [ $? -ne 0 ]; then\n")
                         (format port "      echo \"Error: Download failed. Cleaning up...\"\n")
                         (format port "      rm -f \"$GT_DIR/GlamorousToolkit.zip\"\n")
