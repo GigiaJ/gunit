@@ -1,0 +1,192 @@
+(define-module (gunit packages glamoroustoolkit)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (guix packages)
+  #:use-module (guix download)
+  #:use-module (guix gexp)
+  #:use-module (guix build-system glib-or-gtk)
+  #:use-module (gnu packages bash)
+  #:use-module (gnu packages certs)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages curl)
+  #:use-module (gnu packages elf)
+  #:use-module (gnu packages fontutils)
+  #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages gcc)
+  #:use-module (gnu packages gl)
+  #:use-module (gnu packages glib)
+  #:use-module (gnu packages gnome)
+  #:use-module (gnu packages gtk)
+  #:use-module (gnu packages linux)
+  #:use-module (gnu packages nss)
+  #:use-module (gnu packages version-control)
+  #:use-module (gnu packages vulkan)
+  #:use-module (gnu packages web)
+  #:use-module (gnu packages webkit)
+  #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages xorg))
+
+(define-public glamoroustoolkit
+  (package
+    (name "glamoroustoolkit")
+    (version "1.1.58")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://github.com/feenkcom/gtoolkit-vm/releases/download/v"
+                           version "/GlamorousToolkit-x86_64-unknown-linux-gnu.zip"))
+       (sha256
+        (base32 "0grv5pxn34ixkr5gvd9sdv84i0l1qzhrjhgvs9azbxvk2npbrklc"
+                ))))
+    (build-system glib-or-gtk-build-system)
+    (native-inputs
+     (list patchelf))
+    (inputs
+     `(("bash" ,bash)
+       ("cairo" ,cairo)
+       ("curl" ,curl)
+       ("dbus" ,dbus)
+       ("eudev" ,eudev)
+       ("fontconfig" ,fontconfig)
+       ("freetype" ,freetype)
+       ("glib" ,glib)
+       ("gtk3" ,gtk+)
+       ("harfbuzz" ,harfbuzz)
+       ("libglvnd" ,libglvnd)
+       ("libgit2" ,libgit2)
+       ("libsoup" ,libsoup)
+       ("libx11" ,libx11)
+       ("libxcb" ,libxcb)
+       ("libxcursor" ,libxcursor)
+       ("libxext" ,libxext)
+       ("libxi" ,libxi)
+       ("libxkbcommon" ,libxkbcommon)
+       ("libxrandr" ,libxrandr)
+       ("libxrender" ,libxrender)
+       ("mesa" ,mesa)
+       ("nss-certs" ,nss-certs)
+       ("unzip" ,unzip)
+       ("util-linux-lib" ,util-linux "lib")
+       ("vulkan-loader" ,vulkan-loader)
+       ("wayland" ,wayland)
+       ("webkitgtk" ,webkitgtk)
+       ("zenity" ,zenity)
+       ("gcc-lib" ,gcc "lib")))
+    (arguments
+     (list
+      #:tests? #f
+      #:strip-binaries? #f
+      #:validate-runpath? #f
+      #:phases
+      #~(modify-phases %standard-phases
+          (replace 'unpack
+            (lambda* (#:key source #:allow-other-keys)
+              (invoke "unzip" "-q" source)))
+          (delete 'configure)
+          (delete 'build)
+          (replace 'install
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (bin (string-append out "/bin"))
+                     (lib (string-append out "/lib")))
+                (mkdir-p bin)
+                (mkdir-p lib)
+                (copy-recursively "bin" bin)
+                (copy-recursively "lib" lib))))
+          (add-after 'install 'patchelf-fixup
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (bin (string-append out "/bin"))
+                     (lib (string-append out "/lib"))
+                     (ld.so (search-input-file inputs "/lib/ld-linux-x86-64.so.2"))
+                     (rpath (string-join
+                             (map (lambda (name)
+                                    (string-append (assoc-ref inputs name) "/lib"))
+                                  '("cairo" "dbus" "eudev" "fontconfig" "freetype" "glib"
+                                    "gtk3" "harfbuzz" "libglvnd" "libsoup" "libx11"
+                                    "libxcb" "libxcursor" "libxext" "libxi"
+                                    "libxkbcommon" "libxrandr" "libxrender" "mesa"
+                                    "util-linux-lib" "vulkan-loader" "wayland"
+                                    "webkitgtk" "gcc-lib"))
+                             ":")))
+                (for-each (lambda (file) (chmod file #o755))
+                          (find-files lib "\\.so$"))
+                (for-each (lambda (exe)
+                            (invoke "patchelf"
+                                    "--set-interpreter" ld.so
+                                    "--set-rpath" (string-append rpath ":" lib)
+                                    exe))
+                          (list (string-append bin "/GlamorousToolkit")
+                                (string-append bin "/GlamorousToolkit-cli")))
+                (for-each (lambda (file)
+                            (invoke "patchelf"
+                                    "--set-rpath" (string-append rpath ":" lib)
+                                    file))
+                          (find-files lib "\\.so$"))
+                (with-directory-excursion lib
+                  (when (file-exists? "libcrypto.so")
+                    (symlink "libcrypto.so" "libcrypto.so.1.1"))
+                  (when (file-exists? "libcairo.so")
+                    (symlink "libcairo.so" "libcairo.so.2"))
+                  (when (file-exists? "libgit2.so")
+                    (delete-file "libgit2.so"))
+                  (symlink (string-append (assoc-ref inputs "libgit2") "/lib/libgit2.so")
+                           "libgit2.so.1.1")))))
+(add-after 'patchelf-fixup 'create-wrappers
+            (lambda* (#:key inputs outputs #:allow-other-keys)
+              (let* ((out (assoc-ref outputs "out"))
+                     (bin (string-append out "/bin"))
+                     (bash (assoc-ref inputs "bash"))
+                     (curl (assoc-ref inputs "curl"))
+                     (unzip (assoc-ref inputs "unzip"))
+                     (zenity (assoc-ref inputs "zenity"))
+                     (nss-certs (assoc-ref inputs "nss-certs"))
+                     (mesa (assoc-ref inputs "mesa"))
+                     (vulkan (assoc-ref inputs "vulkan-loader"))
+                     (wayland (assoc-ref inputs "wayland"))
+                     (eudev (assoc-ref inputs "eudev")))
+                (define (create-wrapper name)
+                  (let ((real-bin (string-append bin "/." name "-real"))
+                        (wrapper (string-append bin "/" name)))
+                    (rename-file wrapper real-bin)
+                    (call-with-output-file wrapper
+                      (lambda (port)
+                        (format port "#!~a/bin/sh\n" bash)
+                        (format port "export PATH=\"~a/bin:$PATH\"\n" zenity)
+                        (format port "export LD_LIBRARY_PATH=\"~a/lib:~a/lib:~a/lib:~a/lib:$LD_LIBRARY_PATH\"\n"
+                                mesa vulkan wayland eudev)
+                        (format port "export WINIT_X11_SCALE_FACTOR=1\n")
+                        (format port "export SSL_CERT_DIR=\"~a/etc/ssl/certs\"\n" nss-certs)
+                        (format port "GT_DIR=\"$HOME/.local/share/glamoroustoolkit\"\n")
+                        (format port "GT_IMAGE=\"$GT_DIR/GlamorousToolkit.image\"\n")
+                        (format port "if [ $# -eq 0 ]; then\n")
+                        (format port "  if [ ! -f \"$GT_IMAGE\" ]; then\n")
+                        (format port "    echo \"Downloading Glamorous Toolkit image...\"\n")
+                        (format port "    mkdir -p \"$GT_DIR\"\n")
+                        (format port "    ~a/bin/curl --capath \"$SSL_CERT_DIR\" -f -# -L -o \"$GT_DIR/GlamorousToolkit.zip\" https://github.com/feenkcom/gtoolkit/releases/download/v1.1.58/GlamorousToolkit-image-without-world.zip\n" curl)
+                        (format port "    if [ $? -ne 0 ]; then\n")
+                        (format port "      echo \"Error: Download failed. Cleaning up...\"\n")
+                        (format port "      rm -f \"$GT_DIR/GlamorousToolkit.zip\"\n")
+                        (format port "      exit 1\n")
+                        (format port "    fi\n")
+                        (format port "    ~a/bin/unzip -q \"$GT_DIR/GlamorousToolkit.zip\" -d \"$GT_DIR\"\n" unzip)
+                        (format port "    if [ ! -f \"$GT_IMAGE\" ]; then\n")
+                        (format port "      mv \"$GT_DIR\"/*.image \"$GT_IMAGE\" 2>/dev/null || true\n")
+                        (format port "      mv \"$GT_DIR\"/*.changes \"$GT_DIR/GlamorousToolkit.changes\" 2>/dev/null || true\n")
+                        (format port "    fi\n")
+                        (format port "  fi\n")
+                        (format port "  cd \"$GT_DIR\"\n")
+                        (format port "  exec \"~a\"\n" real-bin)
+                        (format port "else\n")
+                        (format port "  exec \"~a\" \"$@\"\n" real-bin)
+                        (format port "fi\n")))
+                    (chmod wrapper #o755)))
+                (create-wrapper "GlamorousToolkit")
+                (create-wrapper "GlamorousToolkit-cli")))))))
+    (synopsis "GlamorousToolkit Development Environment")
+    (description "GlamorousToolkit is a moldable development environment.")
+    (home-page "https://gtoolkit.com")
+    (license license:expat)))
+
+
+
+glamoroustoolkit
