@@ -255,7 +255,7 @@
     ("alsa-plugins:pulseaudio" ,alsa-plugins "pulseaudio")
     ("font-dejavu" ,font-dejavu)
     ("font-liberation" ,font-liberation)
-    ("imgui" ,imgui-1.86)
+    ("imgui" ,imgui)
     ("mangohud" ,mangohud)
     ("openal" ,openal)
     ("pulseaudio" ,pulseaudio)
