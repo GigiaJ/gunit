@@ -124,7 +124,7 @@
                   pango
                   cairo
                   gdk-pixbuf
-                  atk
+                  at-spi2-core
                   cups
                   libcanberra
                   dbus-glib
@@ -186,7 +186,7 @@
                                   "pango"
                                   "cairo"
                                   "gdk-pixbuf"
-                                  "atk"
+                                  "at-spi2-core"
                                   "cups"
                                   "libcanberra"
                                   "libx11"
