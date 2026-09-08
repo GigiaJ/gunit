@@ -11,6 +11,7 @@
   #:use-module (gnu packages libffi)
   #:use-module (gnu packages cmake)
   #:use-module (gnu packages tls)
+  #:use-module (gnu packages toolkits)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages gcc)
   #:use-module (nonguix build-system binary)
