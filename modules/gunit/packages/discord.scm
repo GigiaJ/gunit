@@ -31,14 +31,17 @@
 (define discord-client
   (package
     (name "discord-client")
-    (version "1.0.160")
+    (version "1.0.169"
+             )
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://dl.discordapp.net/apps/linux/"
                            version "/discord-" version ".tar.gz"))
        (sha256
-        (base32 "1m7lbj41wm7068wa71cn7py80si4mswwrmy04w0ysfhl4d68fg1w"))))
+        (base32
+         "18wg104cvdw7mqnsf8jyvgpbjx8hj1nrndwa2afakfrxz1i7md11"
+         ))))
     (build-system gnu-build-system)
     (arguments
      (list
