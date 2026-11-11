@@ -30,14 +30,15 @@
 (define helium-client
   (package
     (name "helium-client")
-    (version "0.18.2.1")
+    (version "0.21.2.1")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/imputnet/helium-linux/releases/download/"
                            version "/helium-" version "-x86_64_linux.tar.xz"))
        (sha256
-        (base32 "0p0miclv5qvczs35awdf3xas1x93bhhyrh25gpyy7ywap5bdg4s4"
+        (base32
+         "06dmw1h3bssv2s1z7sw7gkyq4s70b5d4djllw1dgny1g10z2ap75"
                 ))))
     (build-system gnu-build-system)
     (arguments
