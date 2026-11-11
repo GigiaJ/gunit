@@ -32,7 +32,8 @@
 (define-public (make-microsoft-edge repo version hash)
   (let* ((name (string-append "microsoft-edge-" repo))
          (appname (if (string=? repo "stable") "edge"
-                      (string-replace-substring name "microsoft-" ""))))
+                      (string-replace-substring name "microsoft-" "")))
+         (msname (string-append "ms" appname)))
     (package
       (name name)
       (version version)
@@ -52,31 +53,22 @@
       (build-system chromium-binary-build-system)
       (arguments
        (list
-        ;; almost 300MB, faster to download and build from Google servers
         #:substitutable? #f
         #:wrapper-plan
-        #~(let ((path (string-append "opt/microsoft/" "ms"
-                                     #$appname "/")))
+        #~(let ((path (string-append "opt/microsoft/" #$msname "/")))
             (map (lambda (file)
                    (string-append path file))
-                 '("msedge" "msedge-sandbox"
+                 '("msedge"
+                   "msedge-sandbox"
                    "msedge_crashpad_handler"
-                   "libEGL.so"
-                   "libGLESv2.so"
-                   ;; "libaugloop_client.so"
                    "liblearning_tools.so"
-                   ;; "libmicrosoft-apis.so"
-;;                   "libmip_core.so"
-;;                   "libmip_protection_sdk.so"
                    "liboneauth.so"
                    "liboneds.so"
                    "libqt5_shim.so"
                    "libqt6_shim.so"
-                   ;; "libsmartscreenn.so"
                    "libtelclient.so"
                    "libvk_swiftshader.so"
                    "libvulkan.so.1"
-                   "libwns_push_client.so"
                    "WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so")))
         #:install-plan
         #~'(("opt/" "/share")
@@ -84,71 +76,61 @@
         #:phases
         #~(modify-phases %standard-phases
             (add-before 'install 'patch-assets
-              ;; Many thanks to
-              ;; https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/browsers/microsoft-edge/default.nix
               (lambda _
                 (let* ((bin (string-append #$output "/bin"))
-                       (share (string-append #$output "/share"))
                        (opt "./opt")
                        (usr/share "./usr/share")
                        (old-exe (string-append
-                                 "/opt/microsoft/msedge/microsoft-"
+                                 "/opt/microsoft/" #$msname "/microsoft-"
                                  #$appname))
                        (exe (string-append bin "/microsoft-"
                                            #$appname)))
-                  ;; This allows us to override CHROME_WRAPPER later.
                   (substitute* (string-append opt
-                                              "/microsoft/msedge/microsoft-"
+                                              "/microsoft/" #$msname "/microsoft-"
                                               #$appname)
                     (("CHROME_WRAPPER")
                      "WRAPPER"))
+                  (for-each
+                   (lambda (desktop)
+                     (substitute* desktop
+                       (("^Exec=/usr/bin/microsoft-edge[-a-z]*")
+                        (string-append "Exec=" exe))))
+                   (find-files (string-append usr/share "/applications")
+                               "\\.desktop$"))
                   (substitute* (string-append usr/share
-                                              "/applications/microsoft-"
-                                              #$appname ".desktop")
-                    (("^Exec=.*")
-                     (string-append "Exec=" exe "\n")))
-                  (substitute* (string-append usr/share
-                                "/gnome-control-center/default-apps/microsoft-"
-                                #$appname ".xml")
+                                              "/gnome-control-center/default-apps/microsoft-"
+                                              #$appname ".xml")
                     ((old-exe)
-                     exe))
-                  ;;(substitute* (string-append usr/share "/menu/microsoft-"
-                                 ;;             #$appname ".menu")
-;;                    (("/opt")
-  ;;                   share)
-    ;;                ((old-exe)
-                  ;;   exe)
-                  ;;)
-
-                  )))
+                     exe)))))
             (add-after 'install 'install-icons
               (lambda _
                 (define (format-icon-size name)
                   (car (string-split (string-drop-right (string-drop name 13)
                                                         4) #\_)))
                 (let ((icons (string-append #$output "/share/icons/hicolor"))
-                      (share (string-append #$output "/share/microsoft/msedge")))
+                      (share (string-append #$output "/share/microsoft/" #$msname)))
                   (for-each (lambda (icon)
                               (let* ((icon-name (basename icon))
                                      (icon-size (format-icon-size icon-name))
                                      (target (string-append icons
-                                              "/"
-                                              icon-size
-                                              "x"
-                                              icon-size
-                                              "/apps/microsoft-"
-                                              #$appname
-                                              ".png")))
+                                                            "/"
+                                                            icon-size
+                                                            "x"
+                                                            icon-size
+                                                            "/apps/microsoft-"
+                                                            #$appname
+                                                            ".png")))
                                 (mkdir-p (dirname target))
                                 (rename-file icon target)))
                             (find-files share "product_logo_.*\\.png")))))
             (add-before 'install-wrapper 'install-exe
               (lambda _
                 (let* ((bin (string-append #$output "/bin"))
-                       (exe (string-append bin "/microsoft-edge"))
+                       (exe (string-append bin "/microsoft-" #$appname))
                        (share (string-append #$output "/share"))
                        (edge-target (string-append share
-                                     "/microsoft/msedge/microsoft-edge")))
+                                                   "/microsoft/" #$msname
+                                                   "/microsoft-" #$appname)))
                   (mkdir-p bin)
                   (symlink edge-target exe)
                   (wrap-program exe
@@ -183,11 +165,10 @@
       (license (nonfree "https://www.microsoft.com/intl/en/edge/terms/")))))
 
 (define-public microsoft-edge-stable
-  (make-microsoft-edge "stable" "150.0.4078.99"
-                       "0p36fav27ik5yjs3k93lvgjsymfi9ysnwg9v5nkjpqhhz753va26"
-                                              ))
+  (make-microsoft-edge "stable" "157.0.4341.46"
+                       "06mna7ipxsykxabypcd29d92h6pwciccy46cb7cnc0vd1r88a9dj"))
 
 (define-public microsoft-edge-beta
-  (make-microsoft-edge "beta" "151.0.4129.35"
-                       "0d4m38xbnpbb98y5xz9h5rzzcfshl01c2l3f794jg6al20yc2jj7"))
-
+  (make-microsoft-edge "beta" "158.0.4370.7"
+                       "0qq0j16gr2q3mmwi64wxgr0b6i5acrwhpqswjr13qh2qr0algdxl"))
+microsoft-edge-stable
