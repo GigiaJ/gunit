@@ -30,14 +30,14 @@
 (define paradise-client
   (package
     (name "paradise-client")
-    (version "0.39.7")
+    (version "0.39.9")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/Paradise-Chat/Paradise/releases/download/v"
                            version "/Paradise-" version ".AppImage"))
        (sha256
-        (base32 "1fc5r9z9cgz3hlg6chavlgaiqzzjas2jvkl9ing78y88wjwphqfk"))))
+        (base32 "1ifmcxflk03qj8qr5a0bwj5afqx6fx327xz550s8jn5kfxl8f1q8"))))
     (build-system gnu-build-system)
     (native-inputs
      (list squashfs-tools))
