@@ -5,7 +5,7 @@
 ;;; Copyright © 2026 Jaggar Boone <jaggar@chickensalad.quest>
 
 
-(define-module (nongnu packages productivity)
+(define-module (gunit packages productivity)
   #:use-module (gnu packages base)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages compression)
